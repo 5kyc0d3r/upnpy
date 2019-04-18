@@ -1,3 +1,5 @@
+import urllib.request
+import upnpy.utils as utils
 from upnpy.ssdp import SSDPFilters
 
 
@@ -17,6 +19,13 @@ class SSDPDevice:
         self.host = address[0]
         self.port = address[1]
         self.response = response
+        self.device_description = None
+
+    def get_device_description(self):
+        device_description_url = utils.parse_http_header(self.response, 'Location')
+        device_description = urllib.request.urlopen(device_description_url).read()
+        self.device_description = device_description.decode()
+        return self.device_description
 
     @staticmethod
     def filter_by(devices, **filters):
