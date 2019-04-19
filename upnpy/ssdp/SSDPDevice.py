@@ -44,12 +44,12 @@ class SSDPDevice:
                 self.device_description = device_description.decode()
                 continue
 
-    def get_device_description(self):
+    def get_description(self):
         if self._check_device_description():
             return self.device_description
 
-    def get_device_services(self):
-        device_description = self.get_device_description()
+    def get_services(self):
+        device_description = self.get_description()
         root = minidom.parseString(device_description)
 
         for service in root.getElementsByTagName('service'):
@@ -65,11 +65,11 @@ class SSDPDevice:
 
         return self.device_services
 
-    def get_device_service_description(self, service_type):
+    def get_service_description(self, service_type):
 
         # Construct the BaseURL (from device response LOCATION header or <URLBase> element in device description)
 
-        device_description = self.get_device_description()
+        device_description = self.get_description()
         location_header_value = utils.parse_http_header(self.response, 'Location')
 
         root = minidom.parseString(device_description)
