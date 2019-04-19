@@ -67,6 +67,8 @@ class SSDPDevice:
 
     def get_service_description(self, service_type):
 
+        # TODO: Allow passing a DeviceService object instead of just the service type
+
         # Construct the BaseURL (from device response LOCATION header or <URLBase> element in device description)
 
         device_description = self.get_description()
