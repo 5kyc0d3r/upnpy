@@ -1,3 +1,6 @@
+import urllib.request
+
+
 def parse_http_header(header, header_key):
 
     """
@@ -20,3 +23,7 @@ def parse_http_header(header, header_key):
 
         if header[0].strip().lower() == header_key.strip().lower():
             return ''.join(header[1::]).split()[0]
+
+
+def make_http_request(url):
+    return urllib.request.urlopen(url)
