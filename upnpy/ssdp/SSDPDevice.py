@@ -75,7 +75,7 @@ class SSDPDevice:
         root = minidom.parseString(device_description)
 
         try:
-            base_url = root.getElementsByTagName('BaseURL')[0]
+            base_url = root.getElementsByTagName('URLBase')[0]
         except IndexError:
             parsed_url = urlparse(location_header_value)
             base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
