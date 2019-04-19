@@ -1,4 +1,4 @@
-import urllib.request
+from urllib.parse import urlparse
 from xml.dom import minidom
 
 import upnpy.utils as utils
@@ -34,34 +34,59 @@ class SSDPDevice:
         self.device_description = None
         self.device_services = []
 
-    def get_device_description(self):
-        device_description_url = utils.parse_http_header(self.response, 'Location')
-        device_description = urllib.request.urlopen(device_description_url).read()
-        self.device_description = device_description.decode()
-        return self.device_description
-
-    def get_device_services(self):
+    def _check_device_description(self):
         while True:
-            if self.device_description:
-                root = minidom.parseString(self.device_description)
-
-                for service in root.getElementsByTagName('service'):
-                    self.device_services.append(
-                        DeviceService(
-                            service_type=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
-                            service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
-                            scpd_url=service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue,
-                            control_url=service.getElementsByTagName('controlURL')[0].firstChild.nodeValue,
-                            event_sub_url=service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
-                        )
-                    )
+            if self.device_description is not None:
+                return True
             else:
-                self.get_device_description()
+                device_description_url = utils.parse_http_header(self.response, 'Location')
+                device_description = utils.make_http_request(device_description_url).read()
+                self.device_description = device_description.decode()
                 continue
 
-            break
+    def get_device_description(self):
+        if self._check_device_description():
+            return self.device_description
+
+    def get_device_services(self):
+        device_description = self.get_device_description()
+        root = minidom.parseString(device_description)
+
+        for service in root.getElementsByTagName('service'):
+            self.device_services.append(
+                DeviceService(
+                    service_type=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
+                    service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
+                    scpd_url=service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue,
+                    control_url=service.getElementsByTagName('controlURL')[0].firstChild.nodeValue,
+                    event_sub_url=service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
+                )
+            )
 
         return self.device_services
+
+    def get_device_service_description(self, service_type):
+
+        # Construct the BaseURL (from device response LOCATION header or <URLBase> element in device description)
+
+        device_description = self.get_device_description()
+        location_header_value = utils.parse_http_header(self.response, 'Location')
+
+        root = minidom.parseString(device_description)
+
+        try:
+            base_url = root.getElementsByTagName('BaseURL')[0]
+        except IndexError:
+            parsed_url = urlparse(location_header_value)
+            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+
+        for service in self.device_services:
+
+            if service_type == service.service_type:
+                service_description = utils.make_http_request(base_url + service.scpd_url).read()
+                return service_description.decode()
+
+        raise ValueError(f'No service found with service type "{service_type}".')
 
     @staticmethod
     def filter_by(devices, **filters):
