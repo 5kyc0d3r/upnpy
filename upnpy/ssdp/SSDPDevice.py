@@ -51,11 +51,12 @@ class SSDPDevice:
             return self.device_description
 
     def get_services(self):
+        device_services = []
         device_description = self.get_description()
         root = minidom.parseString(device_description)
 
         for service in root.getElementsByTagName('service'):
-            self.device_services.append(
+            device_services.append(
                 DeviceService(
                     service_type=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
                     service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
@@ -65,6 +66,7 @@ class SSDPDevice:
                 )
             )
 
+        self.device_services = device_services
         return self.device_services
 
     def get_service_description(self, service_type):
