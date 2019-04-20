@@ -25,5 +25,11 @@ def parse_http_header(header, header_key):
             return ''.join(header[1::]).split()[0]
 
 
-def make_http_request(url):
-    return urllib.request.urlopen(url)
+def make_http_request(url, data=None, headers=None):
+
+    if not headers:
+        headers = {}
+
+    # If data is provided the request method will automatically be set to POST by urllib
+    request = urllib.request.Request(url, data=data, headers=headers)
+    return urllib.request.urlopen(request)
