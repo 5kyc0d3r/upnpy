@@ -8,8 +8,8 @@ class UPnP:
         self.devices = []
         self.selected_device = None
 
-    def discover(self, delay=2, **headers):
-        for device in self.ssdp.m_search(discover_delay=delay, **headers):
+    def discover(self, delay=2, st='ssdp:all', **headers):
+        for device in self.ssdp.m_search(discover_delay=delay, st=st, **headers):
             self.devices.append(device)
 
     def select_igd(self):
