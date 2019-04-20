@@ -21,13 +21,15 @@ class SSDPRequest(SSDPHeader):
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def m_search(self, discover_delay=2, **headers):
+    def m_search(self, discover_delay=2, st='ssdp:all', **headers):
 
         """
         Perform an M-SEARCH SSDP request
 
         :param discover_delay: Device discovery delay in seconds
         :type discover_delay: int
+        :param st: Specify device Search Target
+        :type st: str
         :param headers: Specify M-SEARCH specific headers
         :type headers: str
         :return: List of device that replied
@@ -38,7 +40,7 @@ class SSDPRequest(SSDPHeader):
 
         self.set_header('MAN', '"ssdp:discover"')
         self.set_header('MX', discover_delay)
-        self.set_header('ST', 'ssdp:all')
+        self.set_header('ST', st)
         self.set_headers(**headers)
 
         self.socket.settimeout(discover_delay)
