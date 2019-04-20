@@ -3,6 +3,7 @@ from xml.dom import minidom
 
 import upnpy.utils as utils
 from upnpy.ssdp import SSDPFilters
+from upnpy.soap.Action import SOAPAction
 
 
 class DeviceService:
@@ -33,6 +34,7 @@ class SSDPDevice:
 
         self.device_description = None
         self.device_services = []
+        self.soap_actions = []
 
     def _check_device_description(self):
         while True:
@@ -89,6 +91,52 @@ class SSDPDevice:
                 return service_description.decode()
 
         raise ValueError(f'No service found with service type "{service_type}".')
+
+    def get_actions(self, service_type):
+
+        all_actions = []
+        action_arguments = []
+
+        service_description = self.get_service_description(service_type)
+
+        root = minidom.parseString(service_description)
+        actions = root.getElementsByTagName('action')
+
+        for action in actions:
+            action_name = action.getElementsByTagName('name')[0].firstChild.nodeValue
+
+            # An action's argument list is only required if the action has parameters according to UPnP spec
+            try:
+                action_argument_list = action.getElementsByTagName('argumentList')[0]
+            except IndexError:
+                action_argument_list = None
+
+            if action_argument_list:
+                action_arguments_elements = action_argument_list.getElementsByTagName('argument')
+
+                for argument in action_arguments_elements:
+                    argument_name = argument.getElementsByTagName('name')[0].firstChild.nodeValue
+                    argument_direction = argument.getElementsByTagName('direction')[0].firstChild.nodeValue
+
+                    # Argument return value is optional according to UPnP spec
+                    try:
+                        argument_return_value = argument.getElementsByTagName('retval')[0].firstChild.nodeValue
+                    except IndexError:
+                        argument_return_value = None
+
+                    argument_related_state_variable = argument.getElementsByTagName(
+                        'relatedStateVariable'
+                    )[0].firstChild.nodeValue
+
+                    action_arguments.append(
+                        SOAPAction.Argument(
+                            argument_name, argument_direction, argument_return_value, argument_related_state_variable
+                        )
+                    )
+
+            all_actions.append(SOAPAction(action_name, action_arguments))
+
+        return all_actions
 
     @staticmethod
     def filter_by(devices, **filters):
