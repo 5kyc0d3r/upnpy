@@ -1,6 +1,15 @@
-class _BaseWANIPPPPConnection:
-    def __init__(self):
-        pass
+from upnpy.soap.ServiceTemplates.__BaseTemplate import __BaseTemplate
+from upnpy.soap import SOAP
+
+
+class _BaseWANIPPPPConnection(__BaseTemplate):
+
+    def __init__(self, service, action):
+        super().__init__(service=service, action=action)
+
+        self.actions = {
+            'GetExternalIPAddress': self.get_external_ip_address
+        }
 
     def set_connection_type(self):
         pass
@@ -72,4 +81,4 @@ class _BaseWANIPPPPConnection:
         pass
 
     def get_external_ip_address(self):
-        pass
+        return SOAP.send(service=self.service, action=self.action)
