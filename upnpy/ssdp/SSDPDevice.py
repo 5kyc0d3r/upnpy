@@ -1,29 +1,112 @@
 from urllib.parse import urlparse
 from xml.dom import minidom
+from functools import wraps
 
 import upnpy.utils as utils
 from upnpy.ssdp import SSDPFilters
 from upnpy.soap.Action import SOAPAction
 
 
+def _device_description_required(func):
+
+    """
+    Decorator for retrieving the device description.
+    """
+
+    @wraps(func)
+    def wrapper(instance, *args, **kwargs):
+        if instance.device_description is None:
+            device_description_url = utils.parse_http_header(instance.response, 'Location')
+            device_description = utils.make_http_request(device_description_url).read()
+            instance.device_description = device_description.decode()
+        return func(instance, *args, **kwargs)
+    return wrapper
+
+
+def _device_services_required(func):
+
+    """
+    Decorator for retrieving services provided by the device.
+    """
+
+    @wraps(func)
+    def wrapper(instance, *args, **kwargs):
+        if not instance.device_services:
+            instance.get_services()
+        return func(instance, *args, **kwargs)
+    return wrapper
+
+
+def _base_url_required(func):
+
+    """
+    Decorator for constructing the BaseURL (from device response LOCATION header
+    or <URLBase> element in device description).
+    """
+
+    @wraps(func)
+    def wrapper(instance, *args, **kwargs):
+        if instance.base_url is None:
+            location_header_value = utils.parse_http_header(instance.response, 'Location')
+            root = minidom.parseString(instance.device_description)
+
+            try:
+                parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
+                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+            except IndexError:
+                parsed_url = urlparse(location_header_value)
+                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+
+            instance.base_url = base_url
+
+        return func(instance, *args, **kwargs)
+    return wrapper
+
+
 class DeviceService:
-    def __init__(self, service_type, service_id, scpd_url, control_url, event_sub_url):
-        self.service_type = service_type
+
+    """
+    Object for representing a device service.
+    """
+
+    def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
+        self.service = service
+        self.service_type = self._get_service_type(service)
+        self.service_version = self._get_service_version(service)
         self.service_id = service_id
         self.scpd_url = scpd_url
         self.control_url = control_url
         self.event_sub_url = event_sub_url
+        self.base_url = base_url
+
+    @staticmethod
+    def _get_service_type(service):
+
+        """
+        Parse the service type <serviceType> portion of the service.
+        """
+
+        return service.split(':')[3]
+
+    @staticmethod
+    def _get_service_version(service):
+
+        """
+        Parse the service version <v> portion of the service.
+        """
+
+        return int(service.split(':')[4])
 
 
 class SSDPDevice:
 
     """
-
-    SSDP device data
+    Object for representing an SSDP device.
 
     :param address: SSDP device address
     :type address: tuple
-
+    :param response: Device discovery response data
+    :type response: str
     """
 
     def __init__(self, address, response):
@@ -32,37 +115,34 @@ class SSDPDevice:
         self.port = address[1]
         self.response = response
 
+        self.base_url = None
         self.device_description = None
         self.device_services = []
         self.soap_actions = []
 
-    def _check_device_description(self):
-        while True:
-            if self.device_description is not None:
-                return True
-            else:
-                device_description_url = utils.parse_http_header(self.response, 'Location')
-                device_description = utils.make_http_request(device_description_url).read()
-                self.device_description = device_description.decode()
-                continue
-
-    def get_description(self):
-        if self._check_device_description():
-            return self.device_description
-
+    @_device_description_required
+    @_base_url_required
     def get_services(self):
+
+        """
+        Get the services offered by the device.
+
+        :return: List of services offered by the device
+        :rtype: list
+        """
+
         device_services = []
-        device_description = self.get_description()
-        root = minidom.parseString(device_description)
+        root = minidom.parseString(self.device_description)
 
         for service in root.getElementsByTagName('service'):
             device_services.append(
                 DeviceService(
-                    service_type=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
+                    service=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
                     service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
                     scpd_url=service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue,
                     control_url=service.getElementsByTagName('controlURL')[0].firstChild.nodeValue,
-                    event_sub_url=service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
+                    event_sub_url=service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue,
+                    base_url=self.base_url
                 )
             )
 
@@ -71,30 +151,33 @@ class SSDPDevice:
 
     def get_service_description(self, service_type):
 
+        """
+        Get the description of the specified service.
+
+        :param service_type:
+        :return: Service description
+        :rtype: str
+        """
+
         # TODO: Allow passing a DeviceService object instead of just the service type
-
-        # Construct the BaseURL (from device response LOCATION header or <URLBase> element in device description)
-
-        device_description = self.get_description()
-        location_header_value = utils.parse_http_header(self.response, 'Location')
-
-        root = minidom.parseString(device_description)
-
-        try:
-            base_url = root.getElementsByTagName('URLBase')[0].firstChild.nodeValue
-        except IndexError:
-            parsed_url = urlparse(location_header_value)
-            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
 
         for service in self.device_services:
 
-            if service_type == service.service_type:
-                service_description = utils.make_http_request(base_url + service.scpd_url).read()
+            if service_type == service.service:
+                service_description = utils.make_http_request(service.base_url + service.scpd_url).read()
                 return service_description.decode()
 
         raise ValueError(f'No service found with service type "{service_type}".')
 
     def get_actions(self, service_type):
+
+        """
+        Get the actions available for the specified service.
+
+        :param service_type:
+        :return: List of actions available for the specified service
+        :rtype: list
+        """
 
         all_actions = []
         action_arguments = []
