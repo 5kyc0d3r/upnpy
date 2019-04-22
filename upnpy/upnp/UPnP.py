@@ -92,7 +92,7 @@ class UPnP:
                         return service_template(
                             service=self.selected_service,
                             action=service_action
-                        ).actions[service_action.name](**action_args).read().decode()
+                        ).actions[service_action.name](**action_args)
 
                     raise NotImplementedError(f'No service template was found for service "{service_type}"'
                                               f' with version "{service_version}".')
