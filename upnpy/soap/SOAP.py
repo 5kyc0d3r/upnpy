@@ -1,7 +1,21 @@
 import urllib.parse
+from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import upnpy.utils as utils
+
+
+def _parse_response(response):
+    response = response.read().decode()
+    return_arguments = {}
+
+    xml_root = minidom.parseString(response)
+    xml_response_arguments = xml_root.getElementsByTagName('s:Body')[0].childNodes[0]
+
+    for return_argument in xml_response_arguments.childNodes:
+        return_arguments[return_argument.tagName] = return_argument.firstChild.nodeValue
+
+    return return_arguments
 
 
 def send(service, action, **action_arguments):
@@ -63,4 +77,6 @@ def send(service, action, **action_arguments):
     }
 
     full_control_url = service.base_url + service.control_url
-    return utils.make_http_request(full_control_url, data=soap_body, headers=headers)
+    return _parse_response(
+        response=utils.make_http_request(full_control_url, data=soap_body, headers=headers)
+    )
