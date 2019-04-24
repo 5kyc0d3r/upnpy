@@ -26,6 +26,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetPassword': self.get_password,
             'GetAutoDisconnectTime': self.get_auto_disconnect_time,
             'GetIdleDisconnectTime': self.get_idle_disconnect_time,
+            'GetWarnDisconnectDelay': self.get_warn_disconnect_delay,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -286,7 +287,16 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_warn_disconnect_delay(self):
-        pass
+
+        """
+        This action retrieves the number of seconds of warning to each (potentially) active user of a
+        connection before a connection is terminated.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_nat_rsip_status(self):
         pass
