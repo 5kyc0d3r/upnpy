@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+<actionList>
+<action>
+<name>SetConnectionType</name>
+<argumentList>
+<argument>
+<name>NewConnectionType</name>
+<relatedStateVariable>ConnectionType</relatedStateVariable>
+<direction>in</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>GetConnectionTypeInfo</name>
+<argumentList>
+<argument>
+<name>NewConnectionType</name>
+<relatedStateVariable>ConnectionType</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewPossibleConnectionTypes</name>
+<relatedStateVariable>PossibleConnectionTypes</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>RequestConnection</name>
+</action>
+<action>
+<name>ForceTermination</name>
+</action>
+<action>
+<name>GetStatusInfo</name>
+<argumentList>
+<argument>
+<name>NewConnectionStatus</name>
+<relatedStateVariable>ConnectionStatus</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewLastConnectionError</name>
+<relatedStateVariable>LastConnectionError</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewUptime</name>
+<relatedStateVariable>Uptime</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>GetNATRSIPStatus</name>
+<argumentList>
+<argument>
+<name>NewRSIPAvailable</name>
+<relatedStateVariable>RSIPAvailable</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewNATEnabled</name>
+<relatedStateVariable>NATEnabled</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>GetGenericPortMappingEntry</name>
+<argumentList>
+<argument>
+<name>NewPortMappingIndex</name>
+<relatedStateVariable>PortMappingNumberOfEntries</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewRemoteHost</name>
+<relatedStateVariable>RemoteHost</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewExternalPort</name>
+<relatedStateVariable>ExternalPort</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewProtocol</name>
+<relatedStateVariable>PortMappingProtocol</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewInternalPort</name>
+<relatedStateVariable>InternalPort</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewInternalClient</name>
+<relatedStateVariable>InternalClient</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewEnabled</name>
+<relatedStateVariable>PortMappingEnabled</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewPortMappingDescription</name>
+<relatedStateVariable>PortMappingDescription</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewLeaseDuration</name>
+<relatedStateVariable>PortMappingLeaseDuration</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>GetSpecificPortMappingEntry</name>
+<argumentList>
+<argument>
+<name>NewRemoteHost</name>
+<relatedStateVariable>RemoteHost</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewExternalPort</name>
+<relatedStateVariable>ExternalPort</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewProtocol</name>
+<relatedStateVariable>PortMappingProtocol</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewInternalPort</name>
+<relatedStateVariable>InternalPort</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewInternalClient</name>
+<relatedStateVariable>InternalClient</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewEnabled</name>
+<relatedStateVariable>PortMappingEnabled</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewPortMappingDescription</name>
+<relatedStateVariable>PortMappingDescription</relatedStateVariable>
+<direction>out</direction>
+</argument>
+<argument>
+<name>NewLeaseDuration</name>
+<relatedStateVariable>PortMappingLeaseDuration</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>AddPortMapping</name>
+<argumentList>
+<argument>
+<name>NewRemoteHost</name>
+<relatedStateVariable>RemoteHost</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewExternalPort</name>
+<relatedStateVariable>ExternalPort</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewProtocol</name>
+<relatedStateVariable>PortMappingProtocol</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewInternalPort</name>
+<relatedStateVariable>InternalPort</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewInternalClient</name>
+<relatedStateVariable>InternalClient</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewEnabled</name>
+<relatedStateVariable>PortMappingEnabled</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewPortMappingDescription</name>
+<relatedStateVariable>PortMappingDescription</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewLeaseDuration</name>
+<relatedStateVariable>PortMappingLeaseDuration</relatedStateVariable>
+<direction>in</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>DeletePortMapping</name>
+<argumentList>
+<argument>
+<name>NewRemoteHost</name>
+<relatedStateVariable>RemoteHost</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewExternalPort</name>
+<relatedStateVariable>ExternalPort</relatedStateVariable>
+<direction>in</direction>
+</argument>
+<argument>
+<name>NewProtocol</name>
+<relatedStateVariable>PortMappingProtocol</relatedStateVariable>
+<direction>in</direction>
+</argument>
+</argumentList>
+</action>
+<action>
+<name>GetExternalIPAddress</name>
+<argumentList>
+<argument>
+<name>NewExternalIPAddress</name>
+<relatedStateVariable>ExternalIPAddress</relatedStateVariable>
+<direction>out</direction>
+</argument>
+</argumentList>
+</action>
+</actionList>
+<serviceStateTable>
+<stateVariable sendEvents="no">
+  <name>ConnectionType</name>
+  <dataType>string</dataType>
+    <allowedValueList>
+      <allowedValue>Unconfigured</allowedValue>
+      <allowedValue>IP_Routed</allowedValue>
+      <allowedValue>DHCP_Spoofed</allowedValue>
+      <allowedValue>PPPoE_Bridged</allowedValue>
+      <allowedValue>PPTP_Relay</allowedValue>
+      <allowedValue>L2TP_Relay</allowedValue>
+      <allowedValue>PPPoE_Relay</allowedValue>
+    </allowedValueList>
+</stateVariable>
+<stateVariable sendEvents="yes">
+  <name>PossibleConnectionTypes</name>
+  <dataType>string</dataType>
+    <allowedValueList>
+      <allowedValue>Unconfigured</allowedValue>
+      <allowedValue>IP_Routed</allowedValue>
+      <allowedValue>DHCP_Spoofed</allowedValue>
+      <allowedValue>PPPoE_Bridged</allowedValue>
+      <allowedValue>PPTP_Relay</allowedValue>
+      <allowedValue>L2TP_Relay</allowedValue>
+      <allowedValue>PPPoE_Relay</allowedValue>
+    </allowedValueList>
+</stateVariable>
+<stateVariable sendEvents="yes">
+  <name>ConnectionStatus</name>
+  <dataType>string</dataType>
+    <allowedValueList>
+      <allowedValue>Unconfigured</allowedValue>
+      <allowedValue>Connecting</allowedValue>
+      <allowedValue>Authenticating</allowedValue>
+      <allowedValue>Connected</allowedValue>
+      <allowedValue>PendingDisconnect</allowedValue>
+      <allowedValue>Disconnecting</allowedValue>
+      <allowedValue>Disconnected</allowedValue>
+    </allowedValueList>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>Uptime</name>
+  <dataType>ui4</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>UpstreamMaxBitRate</name>
+  <dataType>ui4</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>DownstreamMaxBitRate</name>
+  <dataType>ui4</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>LastConnectionError</name>
+  <dataType>string</dataType>
+    <allowedValueList>
+      <allowedValue>ERROR_NONE</allowedValue>
+      <allowedValue>ERROR_UNKNOWN</allowedValue>
+    </allowedValueList>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>RSIPAvailable</name>
+  <dataType>boolean</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>NATEnabled</name>
+  <dataType>boolean</dataType>
+</stateVariable>
+<stateVariable sendEvents="yes">
+  <name>ExternalIPAddress</name>
+  <dataType>string</dataType>
+</stateVariable>
+<stateVariable sendEvents="yes">
+  <name>PortMappingNumberOfEntries</name>
+  <dataType>ui2</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>PortMappingEnabled</name>
+  <dataType>boolean</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>PortMappingLeaseDuration</name>
+  <dataType>ui4</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>RemoteHost</name>
+  <dataType>string</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>ExternalPort</name>
+  <dataType>ui2</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>InternalPort</name>
+  <dataType>ui2</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>PortMappingProtocol</name>
+  <dataType>string</dataType>
+    <allowedValueList>
+      <allowedValue>TCP</allowedValue>
+      <allowedValue>UDP</allowedValue>
+    </allowedValueList>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>InternalClient</name>
+  <dataType>string</dataType>
+</stateVariable>
+<stateVariable sendEvents="no">
+  <name>PortMappingDescription</name>
+  <dataType>string</dataType>
+</stateVariable>
+</serviceStateTable>
+</scpd>
