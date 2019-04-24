@@ -11,6 +11,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'SetConnectionType': self.set_connection_type,
             'GetConnectionTypeInfo': self.get_connection_type_info,
             'ConfigureConnection': self.configure_connection,
+            'RequestConnection': self.request_connection,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -67,7 +68,30 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         )
 
     def request_connection(self):
-        pass
+
+        """
+        A client sends this action to initiate a connection on an instance of a connection service that has
+        a configuration already defined. RequestConnection causes the ConnectionStatus to
+        immediately change to Connecting (if implemented) unless the action is not permitted in the
+        current state of the IGD or the specific service instance. This change of state will be evented.
+        RequestConnection should synchronously return at this time in accordance with UPnP
+        architecture requirements that mandate that an action can take no more than 30 seconds to
+        respond synchronously. However, the actual connection setup may take several seconds more to
+        complete. For example, in the case of POTS dial-up connections, the RequestConnection
+        action may trigger the IGD to dial several previously configured phone numbers in sequence and
+        report a failure only if all connection attempts fail. If the connection setup is successful,
+        ConnectionStatus will change to Connected and will be evented. If the connection setup is
+        not successful, ConnectionStatus will eventually revert back to Disconnected and will be
+        evented. LastConnectionError will be set appropriately in either case. While this may be
+        obvious, it is worth noting that a control point must not source packets to the Internet until
+        ConnectionStatus is updated to Connected, or the IGD may drop packets until it transitions
+        to the Connected state.
+
+        :return: Action response
+        :rtype: dict
+        """
+        
+        return SOAP.send(self.service, self.action)
 
     def request_termination(self):
         pass
