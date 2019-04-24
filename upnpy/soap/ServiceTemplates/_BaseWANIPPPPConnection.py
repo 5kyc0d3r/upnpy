@@ -8,13 +8,25 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         super().__init__(service=service, action=action)
 
         self.actions = {
+            'SetConnectionType': self.set_connection_type,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
         }
 
-    def set_connection_type(self):
-        pass
+    def set_connection_type(self, new_connection_type):
+
+        """
+        Set connection type depends on the PossibleConnectionTypes state variable
+        :param new_connection_type:
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewConnectionType=new_connection_type
+        )
 
     def get_connection_type_info(self):
         pass
