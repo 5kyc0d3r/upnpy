@@ -14,7 +14,7 @@ upnp.discover()  # Discover UPnP devices on the network
 
 upnp.select_igd()  # Select the IGD
 
-# Select the service which implements the "AddPortMapping" function
+# Select the service which implements the "GetExternalIPAddress" action
 # Some routers don't implement WANIPConnection but WANPPPConnection instead:
 # urn:schemas-upnp-org:service:WANPPPConnection:1
 upnp.select_service('urn:schemas-upnp-org:service:WANIPConnection:1')
@@ -37,7 +37,7 @@ upnp.discover()  # Discover UPnP devices on the network
 
 upnp.select_igd()  # Select the IGD
 
-# Select the service which implements the "AddPortMapping" function
+# Select the service which implements the "AddPortMapping" action
 # Some routers don't implement WANIPConnection but WANPPPConnection instead:
 # urn:schemas-upnp-org:service:WANPPPConnection:1
 upnp.select_service('urn:schemas-upnp-org:service:WANIPConnection:1')
