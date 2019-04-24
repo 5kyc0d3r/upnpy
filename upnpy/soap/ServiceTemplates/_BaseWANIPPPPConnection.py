@@ -16,6 +16,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'ForceTermination': self.force_termination,
             'SetAutoDisconnectTime': self.set_auto_disconnect_time,
             'SetIdleDisconnectTime': self.set_idle_disconnect_time,
+            'SetWarnDisconnectDelay': self.set_warn_disconnect_delay,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -159,8 +160,21 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             NewIdleDisconnectTime=new_idle_disconnect_time
         )
 
-    def set_warn_disconnect_delay(self):
-        pass
+    def set_warn_disconnect_delay(self, new_warn_disconnect_delay):
+
+        """
+        This action specifies the number of seconds of warning to each (potentially) active user of a
+        connection before a connection is terminated.
+
+        :param new_warn_disconnect_delay:
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewWarnDisconnectDelay=new_warn_disconnect_delay
+        )
 
     def get_status_info(self):
         pass
