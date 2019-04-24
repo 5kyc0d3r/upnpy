@@ -29,6 +29,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetWarnDisconnectDelay': self.get_warn_disconnect_delay,
             'GetNATRSIPStatus': self.get_nat_rsip_status,
             'GetGenericPortMappingEntry': self.get_generic_port_mapping_entry,
+            'GetSpecificPortMappingEntry': self.get_specific_port_mapping_entry,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -331,8 +332,22 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             NewPortMappingIndex=new_port_mapping_index
         )
 
-    def get_specific_port_mapping_entry(self):
-        pass
+    def get_specific_port_mapping_entry(self, new_external_port, new_protocol, new_remote_host=''):
+
+        """
+        This action reports the Static Port Mapping specified by the unique tuple of RemoteHost,
+        ExternalPort and PortMappingProtocol.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewRemoteHost=new_remote_host,
+            NewExternalPort=new_external_port,
+            NewProtocol=new_protocol
+        )
 
     def add_port_mapping(self, new_external_port, new_protocol, new_internal_port, new_internal_client,
                          new_port_mapping_description, new_enabled=1, new_lease_duration=0, new_remote_host=''):
