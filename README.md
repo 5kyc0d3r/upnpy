@@ -17,12 +17,12 @@ upnp.select_igd()  # Select the IGD
 # Select the service which implements the "AddPortMapping" function
 # Some routers don't implement WANIPConnection but WANPPPConnection instead:
 # urn:schemas-upnp-org:service:WANPPPConnection:1
-upnp.select_service('urn:schemas-upnp-org:service:WANPPPConnection:1')
+upnp.select_service('urn:schemas-upnp-org:service:WANIPConnection:1')
 
 # Execute the "GetExternalIPAddress" action
 upnp.execute('GetExternalIPAddress')
 ```
-If the above code ran successfully, it should return a dictionary containing the external IP Address:
+If the above code executed successfully, it should return a dictionary containing the external IP Address:
 
 ```
 {'NewExternalIPAddress': 'xxx.xxx.xxx.xxx'}
