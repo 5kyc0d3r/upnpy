@@ -17,6 +17,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'SetAutoDisconnectTime': self.set_auto_disconnect_time,
             'SetIdleDisconnectTime': self.set_idle_disconnect_time,
             'SetWarnDisconnectDelay': self.set_warn_disconnect_delay,
+            'GetStatusInfo': self.get_status_info,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -177,7 +178,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         )
 
     def get_status_info(self):
-        pass
+
+        """
+        This action retrieves the values of state variables pertaining to connection status.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_link_layer_max_bit_rates(self):
         pass
