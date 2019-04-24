@@ -9,6 +9,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         self.actions = {
             'SetConnectionType': self.set_connection_type,
+            'GetConnectionTypeInfo': self.get_connection_type_info,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -29,7 +30,14 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         )
 
     def get_connection_type_info(self):
-        pass
+
+        """
+        This action retrieves the values of the current connection type and allowable connection types.
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def configure_connection(self):
         pass
