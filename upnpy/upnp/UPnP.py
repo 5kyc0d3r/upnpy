@@ -28,17 +28,21 @@ class UPnP:
     def __init__(self):
         self.ssdp = SSDPRequest()
         self.soap = None
-        self.devices = []
+        self.discovered_devices = []
         self.selected_device = None
         self.selected_service = None
 
     def discover(self, delay=2, st='ssdp:all', **headers):
+        discovered_devices = []
         for device in self.ssdp.m_search(discover_delay=delay, st=st, **headers):
-            self.devices.append(device)
+            discovered_devices.append(device)
+
+        self.discovered_devices = discovered_devices
+        return len(self.discovered_devices)
 
     def select_igd(self):
         device_filter = SSDPDevice.filter_by(
-            self.devices,
+            self.discovered_devices,
             headers={'ST': 'urn:schemas-upnp-org:device:InternetGatewayDevice:1'}
         )
 
