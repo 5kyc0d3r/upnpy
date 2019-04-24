@@ -28,6 +28,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetIdleDisconnectTime': self.get_idle_disconnect_time,
             'GetWarnDisconnectDelay': self.get_warn_disconnect_delay,
             'GetNATRSIPStatus': self.get_nat_rsip_status,
+            'GetGenericPortMappingEntry': self.get_generic_port_mapping_entry,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -310,8 +311,25 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         return SOAP.send(self.service, self.action)
 
-    def get_generic_port_mapping_entry(self):
-        pass
+    def get_generic_port_mapping_entry(self, new_port_mapping_index):
+
+        """
+        This action retrieves NAT port mappings one entry at a time. Control points can call this action
+        with an incrementing array index until no more entries are found on the gateway. If
+        PortMappingNumberOfEntries is updated during a call, the process may have to start over.
+        Entries in the array are contiguous. As entries are deleted, the array is compacted, and the
+        evented variable PortMappingNumberOfEntries is decremented. Port mappings are logically
+        stored as an array on the IGD and retrieved using an array index ranging from 0 to
+        PortMappingNumberOfEntries-1.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewPortMappingIndex=new_port_mapping_index
+        )
 
     def get_specific_port_mapping_entry(self):
         pass
