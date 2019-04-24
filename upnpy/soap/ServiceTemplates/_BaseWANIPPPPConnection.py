@@ -19,6 +19,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'SetWarnDisconnectDelay': self.set_warn_disconnect_delay,
             'GetStatusInfo': self.get_status_info,
             'GetLinkLayerMaxBitRates': self.get_link_layer_max_bit_rates,
+            'GetPPPEncryptionProtocol': self.get_ppp_encryption_protocol,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -201,7 +202,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_ppp_encryption_protocol(self):
-        pass
+
+        """
+        This action retrieves the link layer (PPP) encryption protocol used for this connection.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_ppp_authentication_protocol(self):
         pass
