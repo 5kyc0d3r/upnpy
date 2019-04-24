@@ -180,8 +180,6 @@ class SSDPDevice:
         """
 
         all_actions = []
-        action_arguments = []
-
         service_description = self.get_service_description(service_type)
 
         root = minidom.parseString(service_description)
@@ -189,6 +187,7 @@ class SSDPDevice:
 
         for action in actions:
             action_name = action.getElementsByTagName('name')[0].firstChild.nodeValue
+            action_arguments = []
 
             # An action's argument list is only required if the action has parameters according to UPnP spec
             try:
