@@ -51,6 +51,7 @@ class UPnP:
         if device_filter_length == 1:
             igd = device_filter[0]
             self.selected_device = igd
+            return True
 
         elif device_filter_length > 1:
             raise ValueError('Multiple IGDs found.')
@@ -70,7 +71,7 @@ class UPnP:
         for device_service in self.selected_device.get_services():
             if device_service.service == service:
                 self.selected_service = device_service
-                return
+                return True
 
         raise ValueError(f'The "{service}" service is not available for the selected device.')
 
