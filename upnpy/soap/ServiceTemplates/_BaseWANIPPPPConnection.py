@@ -10,6 +10,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         self.actions = {
             'SetConnectionType': self.set_connection_type,
             'GetConnectionTypeInfo': self.get_connection_type_info,
+            'ConfigureConnection': self.configure_connection,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -40,8 +41,30 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         return SOAP.send(self.service, self.action)
 
-    def configure_connection(self):
-        pass
+    def configure_connection(self, new_username, new_password):
+
+        """
+        A client may send this command to configure a PPP connection on the WAN device and change
+        ConnectionStatus to Disconnected from Unconfigured. By doing so, the client is implicitly
+        allowing any other client in the residential network to initiate a connection using this configuration.
+        The client may choose an instance of a connection service in the Unconfigured state and
+        configure it, or change an existing configuration on a Disconnected connection. By passing NULL
+        values for the parameters, this command may also be used to set the ConnectionStatus from
+        Disconnected to Unconfigured.
+        NOTE: Gateway implementations may choose to keep sensitive information such as Password
+        from being read by a client.
+
+        :param new_username:
+        :param new_password:
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewUsername=new_username,
+            NewPassword=new_password
+        )
 
     def request_connection(self):
         pass
