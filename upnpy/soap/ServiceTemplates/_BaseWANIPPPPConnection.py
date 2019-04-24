@@ -24,6 +24,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetPPPAuthenticationProtocol': self.get_ppp_authentication_protocol,
             'GetUsername': self.get_username,
             'GetPassword': self.get_password,
+            'GetAutoDisconnectTime': self.get_auto_disconnect_time,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -261,7 +262,16 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_auto_disconnect_time(self):
-        pass
+
+        """
+        This action retrieves the time (in seconds) after which an active connection is automatically
+        disconnected.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_idle_disconnect_time(self):
         pass
