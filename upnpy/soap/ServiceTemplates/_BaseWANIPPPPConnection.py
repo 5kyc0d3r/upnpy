@@ -21,6 +21,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetLinkLayerMaxBitRates': self.get_link_layer_max_bit_rates,
             'GetPPPEncryptionProtocol': self.get_ppp_encryption_protocol,
             'GetPPPCompressionProtocol': self.get_ppp_compression_protocol,
+            'GetPPPAuthenticationProtocol': self.get_ppp_authentication_protocol,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -225,7 +226,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_ppp_authentication_protocol(self):
-        pass
+
+        """
+        This action retrieves the link layer (PPP) authentication protocol for this connection.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_username(self):
         pass
