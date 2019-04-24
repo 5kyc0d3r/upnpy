@@ -13,6 +13,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'ConfigureConnection': self.configure_connection,
             'RequestConnection': self.request_connection,
             'RequestTermination': self.request_termination,
+            'ForceTermination': self.force_termination,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -110,7 +111,19 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def force_termination(self):
-        pass
+
+        """
+        A client may send this command to any connection instance in Connected, Connecting,
+        Authenticating, PendingDisconnect or Disconnecting state to change ConnectionStatus to
+        Disconnected. Connection state immediately transitions to Disconnected irrespective of the
+        setting of WarnDisconnectDelay variable.
+        If successful, ConnectionStatus is changed to Disconnected.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def set_auto_disconnect_time(self):
         pass
