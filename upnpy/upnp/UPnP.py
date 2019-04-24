@@ -71,7 +71,7 @@ class UPnP:
         raise ValueError(f'The "{service}" service is not available for the selected device.')
 
     @_service_required
-    def execute(self, action, **action_args):
+    def execute(self, action, *action_args, **action_kwargs):
 
         if type(action) == str:
             action_name = action
@@ -92,7 +92,7 @@ class UPnP:
                         return service_template(
                             service=self.selected_service,
                             action=service_action
-                        ).actions[service_action.name](**action_args)
+                        ).actions[service_action.name](*action_args, **action_kwargs)
 
                     raise NotImplementedError(f'No service template was found for service "{service_type}"'
                                               f' with version "{service_version}".')
