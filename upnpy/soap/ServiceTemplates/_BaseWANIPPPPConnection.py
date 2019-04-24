@@ -14,6 +14,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'RequestConnection': self.request_connection,
             'RequestTermination': self.request_termination,
             'ForceTermination': self.force_termination,
+            'SetAutoDisconnectTime': self.set_auto_disconnect_time,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -125,8 +126,21 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         return SOAP.send(self.service, self.action)
 
-    def set_auto_disconnect_time(self):
-        pass
+    def set_auto_disconnect_time(self, new_auto_disconnect_time):
+
+        """
+        This action sets the time (in seconds) after which an active connection is automatically
+        disconnected.
+
+        :param new_auto_disconnect_time:
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(
+            self.service, self.action,
+            NewAutoDisconnectTime=new_auto_disconnect_time
+        )
 
     def set_idle_disconnect_time(self):
         pass
