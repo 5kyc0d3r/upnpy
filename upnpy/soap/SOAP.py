@@ -65,7 +65,7 @@ def send(service, action, **action_arguments):
             continue
 
         xml_action_name_argument = SubElement(xml_action_name, argument.name)
-        xml_action_name_argument.text = argument_value
+        xml_action_name_argument.text = str(argument_value)
 
     soap_body = tostring(xml_root, short_empty_elements=False)
 
