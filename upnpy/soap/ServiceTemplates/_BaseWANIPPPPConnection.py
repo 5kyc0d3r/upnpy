@@ -27,6 +27,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetAutoDisconnectTime': self.get_auto_disconnect_time,
             'GetIdleDisconnectTime': self.get_idle_disconnect_time,
             'GetWarnDisconnectDelay': self.get_warn_disconnect_delay,
+            'GetNATRSIPStatus': self.get_nat_rsip_status,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -299,7 +300,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_nat_rsip_status(self):
-        pass
+
+        """
+        This action retrieves the current state of NAT and RSIP on the gateway for this connection.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_generic_port_mapping_entry(self):
         pass
