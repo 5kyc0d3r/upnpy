@@ -9,6 +9,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         self.actions = {
             'AddPortMapping': self.add_port_mapping,
+            'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
         }
 
@@ -89,8 +90,13 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             NewLeaseDuration=new_lease_duration
         )
 
-    def delete_port_mapping(self):
-        pass
+    def delete_port_mapping(self, new_external_port, new_protocol, new_remote_host=''):
+        return SOAP.send(
+            self.service, self.action,
+            NewRemoteHost=new_remote_host,
+            NewExternalPort=new_external_port,
+            NewProtocol=new_protocol
+        )
 
     def get_external_ip_address(self):
         return SOAP.send(service=self.service, action=self.action)
