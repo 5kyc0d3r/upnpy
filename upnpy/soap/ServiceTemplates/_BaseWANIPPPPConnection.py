@@ -40,6 +40,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         """
         This action sets the connection to a specific type.
         SetConnectionType depends on the PossibleConnectionTypes state variable.
+
         :param new_connection_type:
         :return: Action response
         :rtype: dict
@@ -54,6 +55,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
         """
         This action retrieves the values of the current connection type and allowable connection types.
+
         :return: Action response
         :rtype: dict
         """
@@ -323,6 +325,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         stored as an array on the IGD and retrieved using an array index ranging from 0 to
         PortMappingNumberOfEntries-1.
 
+        :param new_port_mapping_index:
         :return: Action response
         :rtype: dict
         """
@@ -338,6 +341,9 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         This action reports the Static Port Mapping specified by the unique tuple of RemoteHost,
         ExternalPort and PortMappingProtocol.
 
+        :param new_external_port:
+        :param new_protocol:
+        :param new_remote_host:
         :return: Action response
         :rtype: dict
         """
@@ -351,6 +357,29 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
 
     def add_port_mapping(self, new_external_port, new_protocol, new_internal_port, new_internal_client,
                          new_port_mapping_description, new_enabled=1, new_lease_duration=0, new_remote_host=''):
+
+        """
+        This action creates a new port mapping or overwrites an existing mapping with the same internal
+        client. If the ExternalPort and PortMappingProtocol pair is already mapped to another
+        internal client, an error is returned.
+
+        NOTE: Not all NAT implementations will support:
+          * Wildcard value (i.e. 0) for ExternalPort
+          * InternalPort values that are different from ExternalPort
+          * Dynamic port mappings i.e. with non-Infinite PortMappingLeaseDuration
+
+        :param new_external_port:
+        :param new_protocol:
+        :param new_internal_port:
+        :param new_internal_client:
+        :param new_port_mapping_description:
+        :param new_enabled:
+        :param new_lease_duration:
+        :param new_remote_host:
+        :return: Action response
+        :rtype: dict
+        """
+
         return SOAP.send(
             self.service, self.action,
             NewRemoteHost=new_remote_host,
@@ -364,6 +393,18 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         )
 
     def delete_port_mapping(self, new_external_port, new_protocol, new_remote_host=''):
+
+        """
+        This action deletes a previously instantiated port mapping. As each entry is deleted, the array is
+        compacted, and the evented variable PortMappingNumberOfEntries is decremented.
+
+        :param new_external_port:
+        :param new_protocol:
+        :param new_remote_host:
+        :return: Action response
+        :rtype: dict
+        """
+
         return SOAP.send(
             self.service, self.action,
             NewRemoteHost=new_remote_host,
@@ -372,4 +413,12 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         )
 
     def get_external_ip_address(self):
+
+        """
+        This action retrieves the value of the external IP address on this connection instance.
+
+        :return: Action response
+        :rtype: dict
+        """
+
         return SOAP.send(service=self.service, action=self.action)
