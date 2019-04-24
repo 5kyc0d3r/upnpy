@@ -10,11 +10,16 @@ Lightweight UPnP client library for Python.
 import upnpy
 
 upnp = upnpy.UPnP()
-upnp.discover()
+upnp.discover()  # Discover UPnP devices on the network
 
-upnp.select_igd()
+upnp.select_igd()  # Select the IGD
+
+# Select the service which implements the "AddPortMapping" function
+# Some routers don't implement WANIPConnection but WANPPPConnection instead:
+# urn:schemas-upnp-org:service:WANPPPConnection:1
 upnp.select_service('urn:schemas-upnp-org:service:WANPPPConnection:1')
 
+# Execute the "GetExternalIPAddress" action
 upnp.execute('GetExternalIPAddress')
 ```
 If the above code ran successfully, it should return a dictionary containing the external IP Address:
@@ -28,11 +33,16 @@ If the above code ran successfully, it should return a dictionary containing the
 import upnpy
 
 upnp = upnpy.UPnP()
-upnp.discover()
+upnp.discover()  # Discover UPnP devices on the network
 
-upnp.select_igd()
-upnp.select_service('urn:schemas-upnp-org:service:WANPPPConnection:1')
+upnp.select_igd()  # Select the IGD
 
+# Select the service which implements the "AddPortMapping" function
+# Some routers don't implement WANIPConnection but WANPPPConnection instead:
+# urn:schemas-upnp-org:service:WANPPPConnection:1
+upnp.select_service('urn:schemas-upnp-org:service:WANIPConnection:1')
+
+# Execute the "AddPortMapping" action
 upnp.execute('AddPortMapping', 80, 'TCP', 8000, '192.168.1.3', 'Test UPnPy entry')
 ```
 If the above code executed successfully, a new port mapping should've been created on your router.
