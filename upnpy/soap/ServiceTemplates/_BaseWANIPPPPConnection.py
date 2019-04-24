@@ -23,6 +23,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetPPPCompressionProtocol': self.get_ppp_compression_protocol,
             'GetPPPAuthenticationProtocol': self.get_ppp_authentication_protocol,
             'GetUsername': self.get_username,
+            'GetPassword': self.get_password,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -249,7 +250,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_password(self):
-        pass
+
+        """
+        This action retrieves the password used for the activation of a connection.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_auto_disconnect_time(self):
         pass
