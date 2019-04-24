@@ -18,7 +18,8 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
     def set_connection_type(self, new_connection_type):
 
         """
-        Set connection type depends on the PossibleConnectionTypes state variable
+        This action sets the connection to a specific type.
+        SetConnectionType depends on the PossibleConnectionTypes state variable.
         :param new_connection_type:
         :return: Action response
         :rtype: dict
