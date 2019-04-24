@@ -22,6 +22,7 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
             'GetPPPEncryptionProtocol': self.get_ppp_encryption_protocol,
             'GetPPPCompressionProtocol': self.get_ppp_compression_protocol,
             'GetPPPAuthenticationProtocol': self.get_ppp_authentication_protocol,
+            'GetUsername': self.get_username,
             'AddPortMapping': self.add_port_mapping,
             'DeletePortMapping': self.delete_port_mapping,
             'GetExternalIPAddress': self.get_external_ip_address
@@ -237,7 +238,15 @@ class _BaseWANIPPPPConnection(__BaseTemplate):
         return SOAP.send(self.service, self.action)
 
     def get_username(self):
-        pass
+
+        """
+        This action retrieves the user name used for the activation of a connection.
+
+        :return: Action response
+        :rtype: dict
+        """
+
+        return SOAP.send(self.service, self.action)
 
     def get_password(self):
         pass
