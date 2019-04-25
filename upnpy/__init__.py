@@ -24,3 +24,8 @@ SOFTWARE.
 """
 
 from upnpy.upnp.UPnP import UPnP
+
+
+__version__ = '1.0.0'
+__author__ = '5kyc0d3r'
+__description__ = 'Lightweight UPnP client library for Python.'
