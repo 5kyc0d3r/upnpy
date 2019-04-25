@@ -1,8 +1,10 @@
 import urllib.parse
+import urllib.error
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import upnpy.utils as utils
+from upnpy.upnp import Exceptions
 
 
 def _parse_response(response):
@@ -80,6 +82,22 @@ def send(service, action, **action_arguments):
     }
 
     full_control_url = service.base_url + service.control_url
-    return _parse_response(
-        response=utils.make_http_request(full_control_url, data=soap_body, headers=headers)
-    )
+
+    try:
+        return _parse_response(
+            response=utils.make_http_request(full_control_url, data=soap_body, headers=headers)
+        )
+    except urllib.error.HTTPError as e:
+        if e.code == 500:
+            response = e.read().decode()
+            xml_root = minidom.parseString(response)
+            error_code = xml_root.getElementsByTagName('errorCode')[0].firstChild.nodeValue
+            xml_error_description = xml_root.getElementsByTagName('errorDescription')[0].firstChild
+
+            if xml_error_description is None:
+                error_description = ''
+            else:
+                error_description = xml_error_description.nodeValue
+            raise Exceptions.SOAPError(error_description, int(error_code))
+        else:
+            raise ValueError('Unknown response code received.')
