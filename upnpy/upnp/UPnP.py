@@ -25,6 +25,13 @@ def _service_required(func):
 
 
 class UPnP:
+
+    """
+        **UPnP object**
+
+        A UPnP object used for device discovery and service action invocation.
+    """
+
     def __init__(self):
         self.ssdp = SSDPRequest()
         self.soap = None
@@ -33,6 +40,21 @@ class UPnP:
         self.selected_service = None
 
     def discover(self, delay=2, st='ssdp:all', **headers):
+
+        """
+            **Find UPnP devices on the network**
+
+            Find available UPnP devices on the network by sending an M-SEARCH request.
+
+            :param delay: Discovery delay, amount of time in seconds to wait for a reply from devices
+            :type delay: int
+            :param st: Discovery search target (defaults to ssdp:all)
+            :type st: str
+            :param headers: Optional headers for the request
+            :return: The amount of devices discovered
+            :rtype: int
+        """
+
         discovered_devices = []
         for device in self.ssdp.m_search(discover_delay=delay, st=st, **headers):
             discovered_devices.append(device)
@@ -41,6 +63,16 @@ class UPnP:
         return len(self.discovered_devices)
 
     def select_igd(self):
+
+        """
+            **Select the Internet Gateway Device if available**
+
+            Selects the Internet Gateway device if it's available after discovery.
+
+            :return: True if successful or raises a ValueError exception upon failure
+            :rtype: bool
+        """
+
         device_filter = SSDPDevice.filter_by(
             self.discovered_devices,
             headers={'ST': 'urn:schemas-upnp-org:device:InternetGatewayDevice:1'}
@@ -61,6 +93,18 @@ class UPnP:
 
     @_device_required
     def select_service(self, service):
+
+        """
+            **Select a service to use**
+
+            Select a service to use available on the selected device.
+
+            :param service: The service to select
+            :type service: str, DeviceService
+            :return: True if selection was successful or raises a ValueError exception upon failure
+            :rtype: bool
+        """
+
         if type(service) == str:
             service = service
         elif type(service) == DeviceService:
@@ -77,6 +121,17 @@ class UPnP:
 
     @_service_required
     def execute(self, action, *action_args, **action_kwargs):
+
+        """
+            **Invoke an action for the selected service**
+
+            :param action: The action to invoke
+            :type action: str, SOAPAction
+            :param action_args: If the action requires parameters, pass them here
+            :param action_kwargs: If the action requires parameters, pass them here
+            :return: The response of the invoked action
+            :rtype: dict
+        """
 
         if type(action) == str:
             action_name = action

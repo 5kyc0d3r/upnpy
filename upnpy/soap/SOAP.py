@@ -26,32 +26,36 @@ def _parse_response(response):
 def send(service, action, **action_arguments):
 
     """
-    Example of a RAW SOAP request
+        **Send a SOAP request**
 
-    ----------------------------------------------------------------------------
-    POST path control URL HTTP/1.0
-    HOST: hostname:portNumber
-    CONTENT-LENGTH: bytes in body
-    CONTENT-TYPE: text/xml; charset="utf-8"
-    USER-AGENT: OS/version UPnP/1.1 product/version
-    SOAPACTION: "urn:schemas-upnp-org:service:serviceType:v#actionName"
+        This function allows you to invoke an action for the target service.
 
-    <?xml version="1.0"?>
-    <s:Envelope
-    xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
-    s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-        <s:Body>
-            <u:actionName xmlns:u="urn:schemas-upnp-org:service:serviceType:v">
-                <argumentName>in arg value</argumentName>
-                <!-- other in args and their values go here, if any -->
-            </u:actionName>
-        </s:Body>
-    </s:Envelope>
-    ----------------------------------------------------------------------------
+        :param service: DeviceService object
+        :param action: SOAPAction object
+        :return: Request response data
 
-    :param service: DeviceService object
-    :param action: SOAPAction object
-    :return: Request response data
+
+        - Example of a RAW SOAP request::
+
+            POST path control URL HTTP/1.0
+            HOST: hostname:portNumber
+            CONTENT-LENGTH: bytes in body
+            CONTENT-TYPE: text/xml; charset="utf-8"
+            USER-AGENT: OS/version UPnP/1.1 product/version
+            SOAPACTION: "urn:schemas-upnp-org:service:serviceType:v#actionName"
+
+            <?xml version="1.0"?>
+            <s:Envelope
+            xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+            s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                <s:Body>
+                    <u:actionName xmlns:u="urn:schemas-upnp-org:service:serviceType:v">
+                        <argumentName>in arg value</argumentName>
+                        <!-- other in args and their values go here, if any -->
+                    </u:actionName>
+                </s:Body>
+            </s:Envelope>
+
     """
 
     xml_root = Element('s:Envelope')

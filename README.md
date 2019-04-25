@@ -1,5 +1,7 @@
 # UPnPy
 [![Build Status](https://travis-ci.org/5kyc0d3r/upnpy.svg?branch=master)](https://travis-ci.org/5kyc0d3r/upnpy)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/upnpy.svg)
+![MIT License](https://img.shields.io/badge/license-MIT-red.svg)
 
 Lightweight UPnP client library for Python.
 
@@ -63,7 +65,7 @@ Returns an empty dictionary:
 ```
 
 ## Documentation
-Documentation for the library will be available very soon.
+Documentation is available at [https://upnpy.readthedocs.io](https://upnpy.readthedocs.io)
 
 ## License
 This project is licensed under the terms of the [MIT License](https://github.com/5kyc0d3r/upnpy/blob/master/LICENSE).
