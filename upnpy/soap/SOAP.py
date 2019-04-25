@@ -13,7 +13,10 @@ def _parse_response(response):
     xml_response_arguments = xml_root.getElementsByTagName('s:Body')[0].childNodes[0]
 
     for return_argument in xml_response_arguments.childNodes:
-        return_arguments[return_argument.tagName] = return_argument.firstChild.nodeValue
+        if return_argument.firstChild is None:
+            return_arguments[return_argument.tagName] = ''
+        else:
+            return_arguments[return_argument.tagName] = return_argument.firstChild.nodeValue
 
     return return_arguments
 
