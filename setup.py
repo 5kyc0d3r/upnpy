@@ -23,5 +23,6 @@ setup(
     author=__author__,
     author_email=__author_email__,
     description=__description__,
-    long_description=long_description
+    long_description=long_description,
+    long_description_content_type='text/markdown'
 )
