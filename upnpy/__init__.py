@@ -29,7 +29,7 @@ License
 from upnpy.upnp.UPnP import UPnP
 
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __author__ = '5kyc0d3r'
 __author_email__ = '5kyc0d3r@pm.me'
 __project_url__ = 'https://github.com/5kyc0d3r/upnpy'
