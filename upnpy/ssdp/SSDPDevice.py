@@ -63,41 +63,6 @@ def _base_url_required(func):
     return wrapper
 
 
-class DeviceService:
-
-    """
-    Object for representing a device service.
-    """
-
-    def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
-        self.service = service
-        self.service_type = self._get_service_type(service)
-        self.service_version = self._get_service_version(service)
-        self.service_id = service_id
-        self.scpd_url = scpd_url
-        self.control_url = control_url
-        self.event_sub_url = event_sub_url
-        self.base_url = base_url
-
-    @staticmethod
-    def _get_service_type(service):
-
-        """
-        Parse the service type <serviceType> portion of the service.
-        """
-
-        return service.split(':')[3]
-
-    @staticmethod
-    def _get_service_version(service):
-
-        """
-        Parse the service version <v> portion of the service.
-        """
-
-        return int(service.split(':')[4])
-
-
 class SSDPDevice:
 
     """
@@ -136,7 +101,7 @@ class SSDPDevice:
 
         for service in root.getElementsByTagName('service'):
             device_services.append(
-                DeviceService(
+                self.Service(
                     service=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
                     service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
                     scpd_url=service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue,
@@ -260,3 +225,37 @@ class SSDPDevice:
                 final_filtered_devices.append(device)
 
         return final_filtered_devices
+
+    class Service:
+
+        """
+        Object for representing a device's service.
+        """
+
+        def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
+            self.service = service
+            self.service_type = self._get_service_type(service)
+            self.service_version = self._get_service_version(service)
+            self.service_id = service_id
+            self.scpd_url = scpd_url
+            self.control_url = control_url
+            self.event_sub_url = event_sub_url
+            self.base_url = base_url
+
+        @staticmethod
+        def _get_service_type(service):
+
+            """
+            Parse the service type <serviceType> portion of the service.
+            """
+
+            return service.split(':')[3]
+
+        @staticmethod
+        def _get_service_version(service):
+
+            """
+            Parse the service version <v> portion of the service.
+            """
+
+            return int(service.split(':')[4])

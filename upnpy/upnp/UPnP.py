@@ -1,5 +1,5 @@
 from upnpy.ssdp.SSDPRequest import SSDPRequest
-from upnpy.ssdp.SSDPDevice import SSDPDevice, DeviceService
+from upnpy.ssdp.SSDPDevice import SSDPDevice
 from upnpy.soap.ServiceTemplates import service_templates
 from upnpy.soap.Action import SOAPAction
 
@@ -107,7 +107,7 @@ class UPnP:
 
         if type(service) == str:
             service = service
-        elif type(service) == DeviceService:
+        elif type(service) == SSDPDevice.Service:
             service = service.service
         else:
             raise ValueError('Service must be either a str or DeviceService object.')
