@@ -1,5 +1,5 @@
 from unittest import TestCase
-from upnpy.ssdp.SSDPDevice import SSDPDevice, DeviceService
+from upnpy.ssdp.SSDPDevice import SSDPDevice
 
 with open('tests/xml/device_templates/TestDevice.xml') as xml_file:
     xml = xml_file.read()
@@ -12,7 +12,7 @@ class TestSSDPDevice(TestCase):
         device_services = device.get_services()
 
         target_services = [
-            DeviceService(
+            SSDPDevice.Service(
                 'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1',
                 'urn:upnp-org:serviceId:WANCommonInterfaceConfig.1',
                 '/dynsvc/WANCommonInterfaceConfig:1.xml',
@@ -21,7 +21,7 @@ class TestSSDPDevice(TestCase):
                 'http://192.168.1.1:5431'
             ),
 
-            DeviceService(
+            SSDPDevice.Service(
                 'urn:schemas-upnp-org:service:WANPPPConnection:1',
                 'urn:upnp-org:serviceId:WANPPPConnection.1',
                 '/dynsvc/WANPPPConnection:1.xml',
