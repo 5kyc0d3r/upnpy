@@ -85,6 +85,10 @@ class SSDPDevice:
         self.device_services = []
         self.soap_actions = []
 
+    @_device_services_required
+    def get_device_services(self):
+        return self.device_services
+
     @_device_description_required
     @_base_url_required
     def get_services(self):

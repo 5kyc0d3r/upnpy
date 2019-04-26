@@ -62,6 +62,10 @@ class UPnP:
         self.discovered_devices = discovered_devices
         return len(self.discovered_devices)
 
+    @_device_required
+    def get_services(self):
+        return self.selected_device.get_device_services()
+
     def select_igd(self):
 
         """
