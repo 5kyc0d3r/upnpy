@@ -11,14 +11,6 @@ Subpackages
 Submodules
 ----------
 
-upnpy.soap.Action module
-------------------------
-
-.. automodule:: upnpy.soap.Action
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 upnpy.soap.SOAP module
 ----------------------
 

@@ -1,7 +1,5 @@
 from upnpy.ssdp.SSDPRequest import SSDPRequest
 from upnpy.ssdp.SSDPDevice import SSDPDevice
-from upnpy.soap.ServiceTemplates import service_templates
-from upnpy.soap.Action import SOAPAction
 
 from functools import wraps
 
@@ -12,15 +10,6 @@ def _device_required(func):
         if instance.selected_device:
             return func(instance, *args, **kwargs)
         raise ValueError('No device has been selected.')
-    return wrapper
-
-
-def _service_required(func):
-    @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if instance.selected_service:
-            return func(instance, *args, **kwargs)
-        raise ValueError('No service has been selected.')
     return wrapper
 
 
@@ -37,7 +26,6 @@ class UPnP:
         self.soap = None
         self.discovered_devices = []
         self.selected_device = None
-        self.selected_service = None
 
     def discover(self, delay=2, st='ssdp:all', **headers):
 
@@ -64,7 +52,31 @@ class UPnP:
 
     @_device_required
     def get_services(self):
-        return self.selected_device.get_device_services()
+
+        """
+            **Get the services offered by the device**
+
+            Gets a list of services available on the currently selected device.
+
+            :return: List of services offered by the currently selected device
+            :rtype: list
+        """
+
+        return self.selected_device.get_services()
+
+    @_device_required
+    def get_actions(self):
+
+        """
+            **Get the service actions**
+
+            Gets the actions available for the currently selected service.
+
+            :return: List of actions available for the current service
+            :rtype: list
+        """
+
+        return self.selected_device.get_selected_service().get_actions()
 
     def select_igd(self):
 
@@ -104,26 +116,13 @@ class UPnP:
             Select a service to use available on the selected device.
 
             :param service: The service to select
-            :type service: str, DeviceService
+            :type service: str, SSDPDevice.Service
             :return: True if selection was successful or raises a ValueError exception upon failure
             :rtype: bool
         """
 
-        if type(service) == str:
-            service = service
-        elif type(service) == SSDPDevice.Service:
-            service = service.service
-        else:
-            raise ValueError('Service must be either a str or DeviceService object.')
+        return self.selected_device.select_service(service)
 
-        for device_service in self.selected_device.get_services():
-            if device_service.service == service:
-                self.selected_service = device_service
-                return True
-
-        raise ValueError(f'The "{service}" service is not available for the selected device.')
-
-    @_service_required
     def execute(self, action, *action_args, **action_kwargs):
 
         """
@@ -137,30 +136,4 @@ class UPnP:
             :rtype: dict
         """
 
-        if type(action) == str:
-            action_name = action
-        elif type(action) == SOAPAction:
-            action_name = action.name
-        else:
-            raise ValueError('Action must be either a str or SOAPAction object.')
-
-        for service_action in self.selected_device.get_actions(self.selected_service.service):
-
-            if service_action.name == action_name:
-                service_type = self.selected_service.service_type
-                service_version = self.selected_service.service_version
-
-                if service_type in service_templates.keys():
-                    if service_version in service_templates[service_type].keys():
-                        service_template = service_templates[service_type][service_version]
-                        return service_template(
-                            service=self.selected_service,
-                            action=service_action
-                        ).actions[service_action.name](*action_args, **action_kwargs)
-
-                    raise NotImplementedError(f'No service template was found for service "{service_type}"'
-                                              f' with version "{service_version}".')
-
-                raise NotImplementedError(f'No service template was found for service "{service_type}".')
-
-        raise ValueError(f'The "{action_name}" action is not available for the selected service.')
+        return self.selected_device.get_selected_service().execute(action, *action_args, **action_kwargs)

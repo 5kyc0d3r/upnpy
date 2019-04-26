@@ -6,9 +6,9 @@ from upnpy.ssdp.SSDPDevice import SSDPDevice
 class SSDPRequest(SSDPHeader):
 
     """
-    Create and perform an SSDP request
+        **Create and perform an SSDP request**
 
-    :param method: SSDP request method [M-SEARCH or NOTIFY]
+        :param method: SSDP request method [M-SEARCH or NOTIFY]
     """
 
     def __init__(self, ssdp_mcast_addr='239.255.255.250', ssdp_port=1900, **headers):
@@ -24,16 +24,18 @@ class SSDPRequest(SSDPHeader):
     def m_search(self, discover_delay=2, st='ssdp:all', **headers):
 
         """
-        Perform an M-SEARCH SSDP request
+            **Perform an M-SEARCH SSDP request**
 
-        :param discover_delay: Device discovery delay in seconds
-        :type discover_delay: int
-        :param st: Specify device Search Target
-        :type st: str
-        :param headers: Specify M-SEARCH specific headers
-        :type headers: str
-        :return: List of device that replied
-        :rtype: list
+            Send an SSDP M-SEARCH request for finding UPnP devices on the network.
+
+            :param discover_delay: Device discovery delay in seconds
+            :type discover_delay: int
+            :param st: Specify device Search Target
+            :type st: str
+            :param headers: Specify M-SEARCH specific headers
+            :type headers: str
+            :return: List of device that replied
+            :rtype: list
         """
 
         self.set_method('M-SEARCH')
