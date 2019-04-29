@@ -368,7 +368,7 @@ class SSDPDevice:
                 raise ValueError(f'The "{action_name}" action is not available for this service.')
 
         def __repr__(self):
-            return f'<Service id="{self.id}">'
+            return f'<Service id="{utils.parse_service_id(self.id)}">'
 
         class Action:
 
