@@ -443,6 +443,9 @@ class SSDPDevice:
 
                 return SOAP.send(self.service, self, **action_kwargs)
 
+            def __repr__(self):
+                return f'<Action name="{self.name}">'
+
             class Argument:
 
                 """
