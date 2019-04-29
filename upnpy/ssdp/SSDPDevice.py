@@ -91,7 +91,7 @@ class SSDPDevice:
             :rtype: list
         """
 
-        return list(self.services.keys())
+        return list(self.services.values())
 
     def get_friendly_name(self):
 
