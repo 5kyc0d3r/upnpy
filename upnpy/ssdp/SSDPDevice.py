@@ -73,26 +73,38 @@ class SSDPDevice:
         self.services = {}
         self.selected_service = None
 
-        self._get_description(utils.parse_http_header(response, 'Location'))
-        self._get_type()
-        self._get_base_url()
-        self._get_services()
+        self._get_description_request(utils.parse_http_header(response, 'Location'))
+        self._get_type_request()
+        self._get_base_url_request()
+        self._get_services_request()
 
-    def _get_description(self, url):
+    def get_services(self):
+
+        """
+            **Return a list of services available for the device**
+
+            Returns a list of available services for the device.
+
+            :return: List of services available for this device
+            :rtype: list
+        """
+
+        return list(self.services.keys())
+
+    def _get_description_request(self, url):
         device_description = utils.make_http_request(url).read()
         self.description = device_description
         return device_description.decode()
 
     @_device_description_required
-    def _get_type(self):
+    def _get_type_request(self):
         root = minidom.parseString(self.description)
         device_type = root.getElementsByTagName('deviceType')[0].firstChild.nodeValue
-        print('Device type', device_type)
         self.type_ = device_type
         return self.type_
 
     @_device_description_required
-    def _get_base_url(self):
+    def _get_base_url_request(self):
         location_header_value = utils.parse_http_header(self.response, 'Location')
         root = minidom.parseString(self.description)
 
@@ -108,7 +120,7 @@ class SSDPDevice:
 
     @_device_description_required
     @_base_url_required
-    def _get_services(self):
+    def _get_services_request(self):
         if not self.services:
             device_services = {}
             root = minidom.parseString(self.description)
@@ -168,13 +180,26 @@ class SSDPDevice:
             self.control_url = control_url
             self.event_sub_url = event_sub_url
             self.base_url = base_url
-            self.actions = []
+            self.actions = {}
             self.description = None
 
-            self._get_description()
-            self._get_actions()
+            self._get_description_request()
+            self._get_actions_request()
 
-        def _get_description(self):
+        def get_actions(self):
+
+            """
+                **Return a list of actions available for the service**
+
+                Returns a list of available actions for the service.
+
+                :return: List of actions available for this service
+                :rtype: list
+            """
+
+            return list(self.actions.keys())
+
+        def _get_description_request(self):
 
             """
                 **Get the description of the service**
@@ -190,7 +215,7 @@ class SSDPDevice:
             return self.description
 
         @_service_description_required
-        def _get_actions(self):
+        def _get_actions_request(self):
 
             """
                 **Get the service actions**
@@ -278,7 +303,10 @@ class SSDPDevice:
                 :rtype: dict
             """
 
-            return self.actions[action_name].execute
+            try:
+                return self.actions[action_name]
+            except KeyError:
+                raise ValueError(f'The "{action_name}" action is not available for this service.')
 
         class Action:
 
@@ -312,12 +340,38 @@ class SSDPDevice:
                         raise ValueError('No valid argument direction specified by service for'
                                          f' argument "{argument.name}".')
 
-            def execute(self, **action_kwargs):
+            def get_input_arguments(self):
+
+                """
+                    **Get the input arguments for the action**
+
+                    Gets the input arguments for the action.
+
+                    :return: List of input arguments for the action
+                    :rtype: list
+                """
+
+                return [argument.name for argument in self.args_in]
+
+            def get_output_arguments(self):
+
+                """
+                    **Get the output arguments for the action**
+
+                    Gets the output arguments for the action.
+
+                    :return: List of output arguments for the action
+                    :rtype: list
+                """
+
+                return [argument.name for argument in self.args_out]
+
+            def __call__(self, **action_kwargs):
 
                 """
                     **Execute the action**
 
-                    Executes the action on the service.
+                    Executes the action on the service by calling the class.
 
                     :param action_kwargs: Arguments for this action if any
                     :type action_kwargs: str, int

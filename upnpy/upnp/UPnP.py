@@ -1,6 +1,22 @@
 from upnpy.ssdp.SSDPRequest import SSDPRequest
 import upnpy.utils as utils
 
+from functools import wraps
+
+
+def _device_required(func):
+
+    """
+    Decorator for checking whether a device was selected or not.
+    """
+
+    @wraps(func)
+    def wrapper(instance, *args, **kwargs):
+        if instance.selected_device is None:
+            raise ValueError('No device has been selected.')
+        return func(instance, *args, **kwargs)
+    return wrapper
+
 
 class UPnP:
 
@@ -25,8 +41,8 @@ class UPnP:
             :param delay: Discovery delay, amount of time in seconds to wait for a reply from devices
             :type delay: int
             :param headers: Optional headers for the request
-            :return: The amount of devices discovered
-            :rtype: int
+            :return: List of discovered devices
+            :rtype: list
         """
 
         discovered_devices = []
@@ -34,7 +50,7 @@ class UPnP:
             discovered_devices.append(device)
 
         self.discovered_devices = discovered_devices
-        return len(self.discovered_devices)
+        return self.discovered_devices
 
     def select_igd(self):
 
@@ -61,6 +77,20 @@ class UPnP:
             raise ValueError('Multiple IGDs found. Specify one manually.')
         else:
             raise ValueError('No IGD found.')
+
+    @_device_required
+    def get_services(self):
+
+        """
+            **Return a list of services available for the device**
+
+            Returns a list of available services for the device.
+
+            :return: List of services available for this device
+            :rtype: list
+        """
+
+        return self.selected_device.get_services()
 
     def __getattr__(self, service_id):
 
