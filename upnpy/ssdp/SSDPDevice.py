@@ -367,6 +367,9 @@ class SSDPDevice:
             except KeyError:
                 raise ValueError(f'The "{action_name}" action is not available for this service.')
 
+        def __repr__(self):
+            return f'<Service id="{self.id}">'
+
         class Action:
 
             """
