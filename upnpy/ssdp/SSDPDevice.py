@@ -172,6 +172,40 @@ class SSDPDevice:
 
         return self.services
 
+    def __getitem__(self, service_id):
+
+        """
+            **Allow access to a specific service on the device through a dictionary**
+
+            Allows the user to access a specific service by its ID for the selected device through a dictionary key.
+
+            :param service_id: ID for the service to select
+            :return: Instance of SSDPDevice.Service for the service with the specified service ID
+            :rtype: SSDPDevice.Service
+        """
+
+        try:
+            return self.services[service_id]
+        except KeyError:
+            raise KeyError(f'No service found with ID "{service_id}".')
+
+    def __getattr__(self, service_id):
+
+        """
+            **Allow access to a specific service on the device through an attribute**
+
+            Allows the user to access a specific service by its ID for the device through an attribute.
+
+            :param service_id: ID for the service to use
+            :return: Instance of SSDPDevice.Service for the service with the specified service ID
+            :rtype: SSDPDevice.Service
+        """
+
+        try:
+            return self.services[service_id]
+        except KeyError:
+            raise KeyError(f'No service found with ID "{service_id}".')
+
     def __repr__(self):
         return f'Device <{self.friendly_name}>'
 
@@ -409,7 +443,7 @@ class SSDPDevice:
             class Argument:
 
                 """
-                    **Represents an argument on for an action**
+                    **Represents an argument for an action**
 
                     This class holds the details of an argument for an action.
 
