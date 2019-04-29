@@ -68,12 +68,14 @@ class SSDPDevice:
         self.port = address[1]
         self.response = response
         self.description = None
+        self.friendly_name = None
         self.type_ = None
         self.base_url = None
         self.services = {}
         self.selected_service = None
 
         self._get_description_request(utils.parse_http_header(response, 'Location'))
+        self._get_friendly_name_request()
         self._get_type_request()
         self._get_base_url_request()
         self._get_services_request()
@@ -91,10 +93,30 @@ class SSDPDevice:
 
         return list(self.services.keys())
 
+    def get_friendly_name(self):
+
+        """
+            **Get the friendly name for the device**
+
+            Gets the device's friendly name
+
+            :return: Friendly name of the device
+            :rtype: str
+        """
+
+        return self.friendly_name
+
     def _get_description_request(self, url):
         device_description = utils.make_http_request(url).read()
         self.description = device_description
         return device_description.decode()
+
+    @_device_description_required
+    def _get_friendly_name_request(self):
+        root = minidom.parseString(self.description)
+        device_friendly_name = root.getElementsByTagName('friendlyName')[0].firstChild.nodeValue
+        self.friendly_name = device_friendly_name
+        return self.friendly_name
 
     @_device_description_required
     def _get_type_request(self):
@@ -149,6 +171,9 @@ class SSDPDevice:
             self.services = device_services
 
         return self.services
+
+    def __repr__(self):
+        return f'Device <{self.friendly_name}>'
 
     class Service:
 
