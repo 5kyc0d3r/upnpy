@@ -58,6 +58,16 @@ def send(service, action, **action_arguments):
 
     """
 
+    args_in = action.args_in
+
+    if not all(arg.name in action_arguments.keys() for arg in args_in):
+        raise ValueError(f'Missing arguments for action "{action.name}".')
+
+    for argument in action_arguments.keys():
+        in_argument_names = [arg.name for arg in args_in]
+        if argument not in in_argument_names:
+            raise ValueError(f'This service does not accept the "in" argument "{argument}".')
+
     xml_root = Element('s:Envelope')
     xml_root.set('xmlns:s', 'http://schemas.xmlsoap.org/soap/envelope/')
     xml_root.set('s:encodingStyle', 'http://schemas.xmlsoap.org/soap/encoding/')

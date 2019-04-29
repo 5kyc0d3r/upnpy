@@ -1,16 +1,5 @@
 from upnpy.ssdp.SSDPRequest import SSDPRequest
-from upnpy.ssdp.SSDPDevice import SSDPDevice
-
-from functools import wraps
-
-
-def _device_required(func):
-    @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if instance.selected_device:
-            return func(instance, *args, **kwargs)
-        raise ValueError('No device has been selected.')
-    return wrapper
+import upnpy.utils as utils
 
 
 class UPnP:
@@ -23,11 +12,10 @@ class UPnP:
 
     def __init__(self):
         self.ssdp = SSDPRequest()
-        self.soap = None
         self.discovered_devices = []
         self.selected_device = None
 
-    def discover(self, delay=2, st='ssdp:all', **headers):
+    def discover(self, delay=2, **headers):
 
         """
             **Find UPnP devices on the network**
@@ -36,47 +24,17 @@ class UPnP:
 
             :param delay: Discovery delay, amount of time in seconds to wait for a reply from devices
             :type delay: int
-            :param st: Discovery search target (defaults to ssdp:all)
-            :type st: str
             :param headers: Optional headers for the request
             :return: The amount of devices discovered
             :rtype: int
         """
 
         discovered_devices = []
-        for device in self.ssdp.m_search(discover_delay=delay, st=st, **headers):
+        for device in self.ssdp.m_search(discover_delay=delay, st='upnp:rootdevice', **headers):
             discovered_devices.append(device)
 
         self.discovered_devices = discovered_devices
         return len(self.discovered_devices)
-
-    @_device_required
-    def get_services(self):
-
-        """
-            **Get the services offered by the device**
-
-            Gets a list of services available on the currently selected device.
-
-            :return: List of services offered by the currently selected device
-            :rtype: list
-        """
-
-        return self.selected_device.get_services()
-
-    @_device_required
-    def get_actions(self):
-
-        """
-            **Get the service actions**
-
-            Gets the actions available for the currently selected service.
-
-            :return: List of actions available for the current service
-            :rtype: list
-        """
-
-        return self.selected_device.get_selected_service().get_actions()
 
     def select_igd(self):
 
@@ -89,51 +47,55 @@ class UPnP:
             :rtype: bool
         """
 
-        device_filter = SSDPDevice.filter_by(
-            self.discovered_devices,
-            headers={'ST': 'urn:schemas-upnp-org:device:InternetGatewayDevice:1'}
-        )
+        ig_devices = []
 
-        device_filter_length = len(device_filter)
+        for device in self.discovered_devices:
+            device_type = utils.parse_device_type(device.type_)
+            if device_type == 'InternetGatewayDevice':
+                ig_devices.append(device)
 
-        if device_filter_length == 1:
-            igd = device_filter[0]
-            self.selected_device = igd
+        if len(ig_devices) == 1:
+            self.selected_device = ig_devices[0]
             return True
-
-        elif device_filter_length > 1:
-            raise ValueError('Multiple IGDs found.')
-
+        elif len(ig_devices) > 1:
+            raise ValueError('Multiple IGDs found. Specify one manually.')
         else:
-            raise ValueError('No IGDs found.')
+            raise ValueError('No IGD found.')
 
-    @_device_required
-    def select_service(self, service):
-
-        """
-            **Select a service to use**
-
-            Select a service to use available on the selected device.
-
-            :param service: The service to select
-            :type service: str, SSDPDevice.Service
-            :return: True if selection was successful or raises a ValueError exception upon failure
-            :rtype: bool
-        """
-
-        return self.selected_device.select_service(service)
-
-    def execute(self, action, *action_args, **action_kwargs):
+    def __getattr__(self, service_id):
 
         """
-            **Invoke an action for the selected service**
+            **Allow access to a specific service through an attribute**
 
-            :param action: The action to invoke
-            :type action: str, SOAPAction
-            :param action_args: If the action requires parameters, pass them here
-            :param action_kwargs: If the action requires parameters, pass them here
-            :return: The response of the invoked action
-            :rtype: dict
+            Allows the user to access a specific service by its ID for the selected device through an attribute.
+
+            :param service_id: ID for the service to select
+            :return: Instance of SSDPDevice.Service for the service with the specified service ID
+            :rtype: SSDPDevice.Service
         """
 
-        return self.selected_device.get_selected_service().execute(action, *action_args, **action_kwargs)
+        try:
+            return self.selected_device.services[service_id]
+        except AttributeError:
+            raise AttributeError('No device has been selected.')
+        except KeyError:
+            raise KeyError(f'No service found with ID "{service_id}".')
+
+    def __getitem__(self, service_id):
+
+        """
+            **Allow access to a specific service through a dictionary**
+
+            Allows the user to access a specific service by its ID for the selected device through a dictionary key.
+
+            :param service_id: ID for the service to select
+            :return: Instance of SSDPDevice.Service for the service with the specified service ID
+            :rtype: SSDPDevice.Service
+        """
+
+        try:
+            return self.selected_device.services[service_id]
+        except AttributeError:
+            raise AttributeError('No device has been selected.')
+        except KeyError:
+            raise KeyError(f'No service found with ID "{service_id}".')

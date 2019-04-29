@@ -3,37 +3,34 @@ from xml.dom import minidom
 from functools import wraps
 
 import upnpy.utils as utils
-from upnpy.ssdp import SSDPFilters
-from upnpy.soap.ServiceTemplates import service_templates
+from upnpy.soap import SOAP
 
 
 def _device_description_required(func):
 
     """
-    Decorator for retrieving the device description.
+    Decorator for checking whether the device description is available on a device.
     """
 
     @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if instance.device_description is None:
-            device_description_url = utils.parse_http_header(instance.response, 'Location')
-            device_description = utils.make_http_request(device_description_url).read()
-            instance.device_description = device_description.decode()
-        return func(instance, *args, **kwargs)
+    def wrapper(device, *args, **kwargs):
+        if device.description is None:
+            raise ValueError('No device description retrieved for this device.')
+        return func(device, *args, **kwargs)
     return wrapper
 
 
-def _device_services_required(func):
+def _service_description_required(func):
 
     """
-    Decorator for retrieving services provided by the device.
+    Decorator for checking whether the service description is available on a device's service.
     """
 
     @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if not instance.device_services:
-            instance.get_services()
-        return func(instance, *args, **kwargs)
+    def wrapper(service, *args, **kwargs):
+        if service.description is None:
+            raise ValueError('No service description retrieved for this service.')
+        return func(service, *args, **kwargs)
     return wrapper
 
 
@@ -47,18 +44,7 @@ def _base_url_required(func):
     @wraps(func)
     def wrapper(instance, *args, **kwargs):
         if instance.base_url is None:
-            location_header_value = utils.parse_http_header(instance.response, 'Location')
-            root = minidom.parseString(instance.device_description)
-
-            try:
-                parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
-                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
-            except IndexError:
-                parsed_url = urlparse(location_header_value)
-                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
-
-            instance.base_url = base_url
-
+            raise ValueError('No base URL was retrieved for this device.')
         return func(instance, *args, **kwargs)
     return wrapper
 
@@ -81,139 +67,76 @@ class SSDPDevice:
         self.host = address[0]
         self.port = address[1]
         self.response = response
-
+        self.description = None
+        self.type_ = None
         self.base_url = None
-        self.device_description = None
-        self.device_services = []
+        self.services = {}
         self.selected_service = None
 
-    @_device_services_required
-    def select_service(self, service):
+        self._get_description(utils.parse_http_header(response, 'Location'))
+        self._get_type()
+        self._get_base_url()
+        self._get_services()
 
-        """
-            **Select a service to use**
+    def _get_description(self, url):
+        device_description = utils.make_http_request(url).read()
+        self.description = device_description
+        return device_description.decode()
 
-            Select a service to use available on the selected device.
+    @_device_description_required
+    def _get_type(self):
+        root = minidom.parseString(self.description)
+        device_type = root.getElementsByTagName('deviceType')[0].firstChild.nodeValue
+        print('Device type', device_type)
+        self.type_ = device_type
+        return self.type_
 
-            :param service: The service to select
-            :type service: str, SSDPDevice.Service
-            :return: True if selection was successful or raises a ValueError exception upon failure
-            :rtype: bool
-        """
+    @_device_description_required
+    def _get_base_url(self):
+        location_header_value = utils.parse_http_header(self.response, 'Location')
+        root = minidom.parseString(self.description)
 
-        if type(service) == str:
-            service = service
-        elif type(service) == SSDPDevice.Service:
-            service = service.service
-        else:
-            raise ValueError('Service must be either a str or SSDPDevice.Service object.')
+        try:
+            parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
+            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+        except IndexError:
+            parsed_url = urlparse(location_header_value)
+            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
 
-        for device_service in self.get_services():
-            if device_service.service == service:
-                self.selected_service = device_service
-                return True
-
-        raise ValueError(f'The "{service}" service is not available for this device.')
-
-    def get_selected_service(self):
-
-        """
-            **Get the selected service**
-
-            Get the selected service for this device.
-
-            :return: Return the currently selected service on this device
-            :rtype: SSDPDevice.Service
-        """
-
-        if self.selected_service:
-            return self.selected_service
-        raise ValueError('No service has been selected.')
+        self.base_url = base_url
+        return base_url
 
     @_device_description_required
     @_base_url_required
-    def get_services(self):
+    def _get_services(self):
+        if not self.services:
+            device_services = {}
+            root = minidom.parseString(self.description)
 
-        """
-            **Get the services offered by the device**
-
-            Gets a list of services available on the device.
-
-            :return: List of services offered by the device
-            :rtype: list
-        """
-
-        if not self.device_services:
-            device_services = []
-            root = minidom.parseString(self.device_description)
+            base_url = self.base_url
 
             for service in root.getElementsByTagName('service'):
-                device_services.append(
-                    self.Service(
-                        service=service.getElementsByTagName('serviceType')[0].firstChild.nodeValue,
-                        service_id=service.getElementsByTagName('serviceId')[0].firstChild.nodeValue,
-                        scpd_url=service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue,
-                        control_url=service.getElementsByTagName('controlURL')[0].firstChild.nodeValue,
-                        event_sub_url=service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue,
-                        base_url=self.base_url
+                service_string = service.getElementsByTagName('serviceType')[0].firstChild.nodeValue
+                service_id = service.getElementsByTagName('serviceId')[0].firstChild.nodeValue
+                scpd_url = service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue
+                control_url = service.getElementsByTagName('controlURL')[0].firstChild.nodeValue
+                event_sub_url = service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
+
+                parsed_service_id = utils.parse_service_id(service_id)
+
+                if parsed_service_id not in device_services.keys():
+                    device_services[parsed_service_id] = self.Service(
+                        service=service_string,
+                        service_id=service_id,
+                        scpd_url=scpd_url,
+                        control_url=control_url,
+                        event_sub_url=event_sub_url,
+                        base_url=base_url
                     )
-                )
 
-            self.device_services = device_services
+            self.services = device_services
 
-        return self.device_services
-
-    @staticmethod
-    def filter_by(devices, **filters):
-
-        """
-            **Device filter**
-
-            Filter out devices with specific parameters.
-
-            :param devices: A list containing devices to filter
-            :type devices: list
-            :param filters: Specify filters (choose from ``host``, ``port``, ``headers``)
-            :type filters: str, dict
-            :return: List of filtered devices
-            :rtype: list
-        """
-
-        filtered_devices = {}
-        enabled_filters = [filter_ for filter_ in filters]
-        final_filtered_devices = []
-
-        for device in devices:
-            filtered_devices[device] = {'successful_filters': []}
-
-            for user_filter, user_filter_value in filters.items():
-
-                if user_filter == 'host':
-                    if SSDPFilters.host_filter(device, host=user_filter_value):
-                        filtered_devices[device]['successful_filters'].append(user_filter)
-                        continue
-
-                elif user_filter == 'port':
-                    if SSDPFilters.port_filter(device, port=user_filter_value):
-                        filtered_devices[device]['successful_filters'].append(user_filter)
-                        continue
-
-                elif user_filter == 'headers':
-                    if SSDPFilters.header_filter(device, headers=user_filter_value):
-                        filtered_devices[device]['successful_filters'].append(user_filter)
-                        continue
-
-                else:
-                    raise KeyError(f'Unknown filter "{user_filter}".')
-
-            filters_successful_on_device = all(
-                enabled_filter in filtered_devices[device]['successful_filters'] for enabled_filter in enabled_filters
-            )
-
-            if filters_successful_on_device:
-                final_filtered_devices.append(device)
-
-        return final_filtered_devices
+        return self.services
 
     class Service:
 
@@ -238,9 +161,9 @@ class SSDPDevice:
 
         def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
             self.service = service
-            self.service_type = self._get_service_type(service)
-            self.service_version = self._get_service_version(service)
-            self.service_id = service_id
+            self.type_ = self._get_service_type(service)
+            self.version = self._get_service_version(service)
+            self.id = service_id
             self.scpd_url = scpd_url
             self.control_url = control_url
             self.event_sub_url = event_sub_url
@@ -248,33 +171,10 @@ class SSDPDevice:
             self.actions = []
             self.description = None
 
-        def get_type(self):
+            self._get_description()
+            self._get_actions()
 
-            """
-                **Get the type of the service**
-
-                Gets the <serviceType> portion of a full service string.
-
-                :return: Service type
-                :rtype: str
-            """
-
-            return self.service_type
-
-        def get_version(self):
-
-            """
-                **Get the version of the service**
-
-                Gets the <v> portion of a full service string.
-
-                :return: Service version
-                :rtype: int
-            """
-
-            return self.service_version
-
-        def get_description(self):
+        def _get_description(self):
 
             """
                 **Get the description of the service**
@@ -285,12 +185,12 @@ class SSDPDevice:
                 :rtype: str
             """
 
-            if self.description is None:
-                service_description = utils.make_http_request(self.base_url + self.scpd_url).read()
-                return service_description.decode()
+            service_description = utils.make_http_request(self.base_url + self.scpd_url).read()
+            self.description = service_description.decode()
             return self.description
 
-        def get_actions(self):
+        @_service_description_required
+        def _get_actions(self):
 
             """
                 **Get the service actions**
@@ -301,8 +201,8 @@ class SSDPDevice:
                 :rtype: list
             """
 
-            all_actions = []
-            service_description = self.get_description()
+            all_actions = {}
+            service_description = self.description
 
             root = minidom.parseString(service_description)
             actions = root.getElementsByTagName('action')
@@ -336,57 +236,17 @@ class SSDPDevice:
 
                         action_arguments.append(
                             self.Action.Argument(
-                                argument_name, argument_direction, argument_return_value,
+                                argument_name,
+                                argument_direction,
+                                argument_return_value,
                                 argument_related_state_variable
                             )
                         )
 
-                all_actions.append(self.Action(action_name, action_arguments))
+                all_actions[action_name] = self.Action(action_name, action_arguments, self)
 
+            self.actions = all_actions
             return all_actions
-
-        def execute(self, action, *action_args, **action_kwargs):
-
-            """
-                **Invoke an action for the selected service**
-
-                Invokes an action for the current service.
-
-                :param action: The action to invoke
-                :type action: str, SOAPAction
-                :param action_args: If the action requires parameters, pass them here
-                :param action_kwargs: If the action requires parameters, pass them here
-                :return: The response of the invoked action
-                :rtype: dict
-            """
-
-            if type(action) == str:
-                action_name = action
-            elif type(action) == SSDPDevice.Service.Action:
-                action_name = action.name
-            else:
-                raise ValueError('Action must be either a str or SSDPDevice.Service.Action object.')
-
-            for service_action in self.get_actions():
-
-                if service_action.name == action_name:
-                    service_type = self.get_type()
-                    service_version = self.get_version()
-
-                    if service_type in service_templates.keys():
-                        if service_version in service_templates[service_type].keys():
-                            service_template = service_templates[service_type][service_version]
-                            return service_template(
-                                service=self,
-                                action=service_action
-                            ).actions[service_action.name](*action_args, **action_kwargs)
-
-                        raise NotImplementedError(f'No service template was found for service "{service_type}"'
-                                                  f' with version "{service_version}".')
-
-                    raise NotImplementedError(f'No service template was found for service "{service_type}".')
-
-            raise ValueError(f'The "{action_name}" action is not available for the selected service.')
 
         @staticmethod
         def _get_service_type(service):
@@ -406,12 +266,83 @@ class SSDPDevice:
 
             return int(service.split(':')[4])
 
+        def __getattr__(self, action_name):
+
+            """
+                **Allow executing an action through an attribute**
+
+                Allows executing the specified action on the service through an attribute.
+
+                :param action_name: Name of the action to execute on the service
+                :return: Response from the device's service after executing the specified action
+                :rtype: dict
+            """
+
+            return self.actions[action_name].execute
+
         class Action:
-            def __init__(self, name, argument_list):
+
+            """
+                **Represents an action on a service**
+
+                This class holds the details of a specific action available on a service.
+
+                :param name: Name of the action
+                :type name: str
+                :param argument_list: List of in / out arguments the action has
+                :type argument_list: list
+                :param service: The service to which this action belongs
+                :type service: SSDPDevice.Service
+            """
+
+            def __init__(self, name, argument_list, service):
                 self.name = name
                 self.arguments = argument_list
+                self.args_in = []
+                self.args_out = []
+                self.service = service
+
+                for argument in self.arguments:
+                    direction = argument.direction
+                    if direction == 'in':
+                        self.args_in.append(argument)
+                    elif direction == 'out':
+                        self.args_out.append(argument)
+                    else:
+                        raise ValueError('No valid argument direction specified by service for'
+                                         f' argument "{argument.name}".')
+
+            def execute(self, **action_kwargs):
+
+                """
+                    **Execute the action**
+
+                    Executes the action on the service.
+
+                    :param action_kwargs: Arguments for this action if any
+                    :type action_kwargs: str, int
+                    :return: Response from the device's service after executing the action
+                    :rtype: dict
+                """
+
+                return SOAP.send(self.service, self, **action_kwargs)
 
             class Argument:
+
+                """
+                    **Represents an argument on for an action**
+
+                    This class holds the details of an argument for an action.
+
+                    :param name: Name of the argument
+                    :type name: str
+                    :param direction: Direction of the argument (in/out)
+                    :type direction: str
+                    :param return_value: Identifies at most one output argument as the return value
+                    :type return_value: str
+                    :param related_state_variable: Defines the type of the argument
+                """
+
                 def __init__(self, name, direction, return_value, related_state_variable):
                     self.name = name
                     self.direction = direction

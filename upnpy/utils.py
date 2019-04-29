@@ -1,6 +1,36 @@
 import urllib.request
 
 
+def parse_device_type(device_type):
+
+    """
+        **Parse the the deviceType string**
+
+        Parses only the deviceType portion of the device type string
+
+        :param device_type: Full device type string
+        :return: Parsed device type
+        :rtype: str
+    """
+
+    return device_type.split(':')[3:][0]
+
+
+def parse_service_id(service_id):
+
+    """
+        **Parse the the serviceID string**
+
+        Parses only the serviceID portion of the service ID string
+
+        :param service_id: Full device type string
+        :return: Parsed service ID
+        :rtype: str
+    """
+
+    return service_id.split(':')[3:][0]
+
+
 def parse_http_header(header, header_key):
 
     """
