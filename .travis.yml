@@ -5,4 +5,4 @@ python:
   - "3.7"
 
 script:
-  - flake8 upnpy
+  - flake8 --ignore=E501,F401 upnpy
