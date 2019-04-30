@@ -23,7 +23,7 @@ class UPnP:
     """
         **UPnP object**
 
-        A UPnP object used for device discovery and service action invocation.
+        A UPnP object used for device discovery
     """
 
     def __init__(self):
