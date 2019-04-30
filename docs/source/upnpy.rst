@@ -21,6 +21,14 @@ upnpy.utils module
     :undoc-members:
     :show-inheritance:
 
+upnpy.exceptions module
+-----------------------
+
+.. automodule:: upnpy.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

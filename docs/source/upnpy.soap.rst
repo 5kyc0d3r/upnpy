@@ -1,13 +1,6 @@
 upnpy.soap package
 ==================
 
-Subpackages
------------
-
-.. toctree::
-
-    upnpy.soap.ServiceTemplates
-
 Submodules
 ----------
 

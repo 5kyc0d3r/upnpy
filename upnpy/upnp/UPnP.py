@@ -43,7 +43,7 @@ class UPnP:
 
             Gets the Internet Gateway device if it's available after discovery.
 
-            :return: The IGD if successful or raises a ValueError exception upon failure
+            :return: The IGD if successful or raises a upnpy.exceptions.IGDError exception upon failure
             :rtype: SSDPDevice
         """
 

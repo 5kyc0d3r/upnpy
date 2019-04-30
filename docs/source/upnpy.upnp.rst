@@ -4,14 +4,6 @@ upnpy.upnp package
 Submodules
 ----------
 
-upnpy.upnp.Exceptions module
-----------------------------
-
-.. automodule:: upnpy.upnp.Exceptions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 upnpy.upnp.UPnP module
 ----------------------
 

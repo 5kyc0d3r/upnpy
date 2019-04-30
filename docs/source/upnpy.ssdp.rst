@@ -12,13 +12,6 @@ upnpy.ssdp.SSDPDevice module
     :undoc-members:
     :show-inheritance:
 
-upnpy.ssdp.SSDPFilters module
------------------------------
-
-.. automodule:: upnpy.ssdp.SSDPFilters
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 upnpy.ssdp.SSDPHeader module
 ----------------------------
