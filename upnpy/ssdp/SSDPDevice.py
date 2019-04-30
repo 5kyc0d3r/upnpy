@@ -241,8 +241,10 @@ class SSDPDevice:
             self.base_url = base_url
             self.actions = {}
             self.description = None
+            self.state_variables = {}
 
             self._get_description_request()
+            self._get_state_variables_request()
             self._get_actions_request()
 
         def get_actions(self):
@@ -332,6 +334,36 @@ class SSDPDevice:
             self.actions = all_actions
             return all_actions
 
+        @_service_description_required
+        def _get_state_variables_request(self):
+
+            service_description = self.description
+
+            root = minidom.parseString(service_description)
+            state_variables = {}
+
+            xml_state_variables = root.getElementsByTagName('stateVariable')
+
+            for state_variable in xml_state_variables:
+                state_variable_name = state_variable.getElementsByTagName('name')[0].firstChild.nodeValue
+                state_variable_data_type = state_variable.getElementsByTagName('dataType')[0].firstChild.nodeValue
+                state_variable_allowed_value_list = []
+
+                xml_allowed_values = state_variable.getElementsByTagName('allowedValue')
+
+                if xml_allowed_values:
+                    for allowed_value in xml_allowed_values:
+                        state_variable_allowed_value_list.append(allowed_value.firstChild.nodeValue)
+
+                state_variables[state_variable_name] = self.StateVariable(
+                    state_variable_name,
+                    state_variable_data_type,
+                    state_variable_allowed_value_list
+                )
+
+            self.state_variables = state_variables
+            return self.state_variables
+
         @staticmethod
         def _get_service_type(service):
 
@@ -413,7 +445,19 @@ class SSDPDevice:
                     :rtype: list
                 """
 
-                return [argument.name for argument in self.args_in]
+                input_arguments = []
+
+                for argument in self.args_in:
+                    related_state_variable = self.service.state_variables[argument.related_state_variable]
+                    input_arguments.append(
+                        {
+                            'name': argument.name,
+                            'data_type': related_state_variable.data_type,
+                            'allowed_value_list': related_state_variable.allowed_value_list
+                        }
+                    )
+
+                return input_arguments
 
             def get_output_arguments(self):
 
@@ -426,7 +470,19 @@ class SSDPDevice:
                     :rtype: list
                 """
 
-                return [argument.name for argument in self.args_out]
+                output_arguments = []
+
+                for argument in self.args_out:
+                    related_state_variable = self.service.state_variables[argument.related_state_variable]
+                    output_arguments.append(
+                        {
+                            'name': argument.name,
+                            'data_type': related_state_variable.data_type,
+                            'allowed_value_list': related_state_variable.allowed_value_list
+                        }
+                    )
+
+                return output_arguments
 
             def __call__(self, **action_kwargs):
 
@@ -467,3 +523,12 @@ class SSDPDevice:
                     self.direction = direction
                     self.return_value = return_value
                     self.related_state_variable = related_state_variable
+
+        class StateVariable:
+            def __init__(self, name, data_type, allowed_value_list=None):
+                self.name = name
+                self.data_type = data_type
+                self.allowed_value_list = allowed_value_list
+
+            def __repr__(self):
+                return f'StateVariable <name="{self.name}">'
