@@ -4,7 +4,7 @@ from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 import upnpy.utils as utils
-from upnpy.upnp import Exceptions
+from upnpy import exceptions
 
 
 def _parse_response(response):
@@ -61,12 +61,22 @@ def send(service, action, **action_arguments):
     args_in = action.args_in
 
     if not all(arg.name in action_arguments.keys() for arg in args_in):
-        raise ValueError(f'Missing arguments for action "{action.name}".')
+
+        missing_arguments = []
+
+        for argument in action.args_in:
+            if argument.name not in action_arguments.keys():
+                missing_arguments.append(argument.name)
+
+        raise exceptions.ArgumentError(
+            f'Missing arguments for action "{action.name}".',
+            missing_arguments
+        )
 
     for argument in action_arguments.keys():
         in_argument_names = [arg.name for arg in args_in]
         if argument not in in_argument_names:
-            raise ValueError(f'This service does not accept the "in" argument "{argument}".')
+            raise exceptions.ArgumentError(f'This service does not accept the "in" argument "{argument}".', argument)
 
     xml_root = Element('s:Envelope')
     xml_root.set('xmlns:s', 'http://schemas.xmlsoap.org/soap/envelope/')
@@ -112,6 +122,6 @@ def send(service, action, **action_arguments):
                 error_description = ''
             else:
                 error_description = xml_error_description.nodeValue
-            raise Exceptions.SOAPError(error_description, int(error_code))
+            raise exceptions.SOAPError(error_description, int(error_code))
         else:
-            raise ValueError('Unknown response code received.')
+            raise exceptions.SOAPError('Unknown response code received.', e.code)

@@ -1,21 +1,6 @@
 from upnpy.ssdp.SSDPRequest import SSDPRequest
+from upnpy import exceptions
 import upnpy.utils as utils
-
-from functools import wraps
-
-
-def _device_required(func):
-
-    """
-    Decorator for checking whether a device was selected or not.
-    """
-
-    @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if instance.selected_device is None:
-            raise ValueError('No device has been selected.')
-        return func(instance, *args, **kwargs)
-    return wrapper
 
 
 class UPnP:
@@ -72,6 +57,6 @@ class UPnP:
         if len(ig_devices) == 1:
             return ig_devices[0]
         elif len(ig_devices) > 1:
-            raise ValueError('Multiple IGDs found. Specify one manually.')
+            raise exceptions.IGDError('Multiple IGDs found. Specify one manually.')
         else:
-            raise ValueError('No IGD found.')
+            raise exceptions.IGDError('No IGD found.')

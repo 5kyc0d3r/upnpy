@@ -4,6 +4,7 @@ from functools import wraps
 
 import upnpy.utils as utils
 from upnpy.soap import SOAP
+from upnpy import exceptions
 
 
 def _device_description_required(func):
@@ -15,7 +16,7 @@ def _device_description_required(func):
     @wraps(func)
     def wrapper(device, *args, **kwargs):
         if device.description is None:
-            raise ValueError('No device description retrieved for this device.')
+            raise exceptions.NotRetrievedError('No device description retrieved for this device.')
         return func(device, *args, **kwargs)
     return wrapper
 
@@ -29,7 +30,7 @@ def _service_description_required(func):
     @wraps(func)
     def wrapper(service, *args, **kwargs):
         if service.description is None:
-            raise ValueError('No service description retrieved for this service.')
+            raise exceptions.NotRetrievedError('No service description retrieved for this service.')
         return func(service, *args, **kwargs)
     return wrapper
 
@@ -44,7 +45,7 @@ def _base_url_required(func):
     @wraps(func)
     def wrapper(instance, *args, **kwargs):
         if instance.base_url is None:
-            raise ValueError('No base URL was retrieved for this device.')
+            raise exceptions.NotRetrievedError('No base URL was retrieved for this device.')
         return func(instance, *args, **kwargs)
     return wrapper
 
@@ -187,7 +188,7 @@ class SSDPDevice:
         try:
             return self.services[service_id]
         except KeyError:
-            raise KeyError(f'No service found with ID "{service_id}".')
+            raise exceptions.ServiceNotFoundError(f'No service found with ID "{service_id}".', service_id)
 
     def __getattr__(self, service_id):
 
@@ -204,7 +205,7 @@ class SSDPDevice:
         try:
             return self.services[service_id]
         except KeyError:
-            raise KeyError(f'No service found with ID "{service_id}".')
+            raise exceptions.ServiceNotFoundError(f'No service found with ID "{service_id}".', service_id)
 
     def __repr__(self):
         return f'Device <{self.friendly_name}>'
@@ -397,7 +398,10 @@ class SSDPDevice:
             try:
                 return self.actions[action_name]
             except KeyError:
-                raise ValueError(f'The "{action_name}" action is not available for this service.')
+                raise exceptions.ActionNotFoundError(
+                    f'The "{action_name}" action is not available for this service.',
+                    action_name
+                )
 
         def __repr__(self):
             return f'<Service id="{utils.parse_service_id(self.id)}">'
@@ -431,8 +435,10 @@ class SSDPDevice:
                     elif direction == 'out':
                         self.args_out.append(argument)
                     else:
-                        raise ValueError('No valid argument direction specified by service for'
-                                         f' argument "{argument.name}".')
+                        raise exceptions.ArgumentError(
+                            f'No valid argument direction specified by service for argument "{argument.name}".',
+                            argument.name
+                        )
 
             def get_input_arguments(self):
 
