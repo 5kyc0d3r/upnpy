@@ -404,7 +404,7 @@ class SSDPDevice:
                 )
 
         def __repr__(self):
-            return f'<Service id="{utils.parse_service_id(self.id)}">'
+            return f'<Service ({self.type_}) id="{utils.parse_service_id(self.id)}">'
 
         class Action:
 
