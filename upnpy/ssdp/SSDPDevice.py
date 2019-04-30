@@ -256,7 +256,7 @@ class SSDPDevice:
                 :rtype: list
             """
 
-            return list(self.actions.keys())
+            return list(self.actions.values())
 
         def _get_description_request(self):
 
