@@ -1,8 +1,8 @@
 # UPnPy
 [![Build Status](https://travis-ci.org/5kyc0d3r/upnpy.svg?branch=master)](https://travis-ci.org/5kyc0d3r/upnpy)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/upnpy.svg)
-![PyPI package version](https://img.shields.io/pypi/v/upnpy.svg)
-![MIT License](https://img.shields.io/badge/license-MIT-red.svg)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/upnpy.svg)](https://pypi.org/project/UPnPy/)
+[![PyPI package version](https://img.shields.io/pypi/v/upnpy.svg)](https://pypi.org/project/UPnPy/)
+[![MIT License](https://img.shields.io/badge/license-MIT-red.svg)](https://github.com/5kyc0d3r/upnpy/blob/master/LICENSE)
 
 Lightweight UPnP client library for Python.
 
