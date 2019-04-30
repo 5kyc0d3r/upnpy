@@ -9,7 +9,7 @@ with open(path.join(current_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name='UPnPy',
     version=__version__,
-    packages=['tests', 'upnpy', 'upnpy.soap', 'upnpy.soap.ServiceTemplates', 'upnpy.ssdp', 'upnpy.upnp'],
+    packages=['tests', 'upnpy', 'upnpy.soap', 'upnpy.ssdp', 'upnpy.upnp'],
     keywords=['upnp', 'upnpy'],
     classifiers=[
         'Development Status :: 4 - Beta',
