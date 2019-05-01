@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 from xml.dom import minidom
 from functools import wraps
+import urllib.error
 
 import upnpy.utils as utils
 from upnpy.soap import SOAP
@@ -31,6 +32,8 @@ def _service_description_required(func):
     def wrapper(service, *args, **kwargs):
         if service.description is None:
             raise exceptions.NotRetrievedError('No service description retrieved for this service.')
+        elif service.description == exceptions.NotAvailableError:
+            return
         return func(service, *args, **kwargs)
     return wrapper
 
@@ -259,6 +262,9 @@ class SSDPDevice:
                 :rtype: list
             """
 
+            if self.description == exceptions.NotAvailableError:
+                raise exceptions.NotAvailableError('Can\'t get actions because a description for this service is'
+                                                   ' not available.')
             return list(self.actions.values())
 
         def _get_description_request(self):
@@ -272,8 +278,15 @@ class SSDPDevice:
                 :rtype: str
             """
 
-            service_description = utils.make_http_request(self.base_url + self.scpd_url).read()
-            self.description = service_description.decode()
+            try:
+                service_description = utils.make_http_request(self.base_url + self.scpd_url).read()
+                self.description = service_description.decode()
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    self.description = exceptions.NotAvailableError
+                else:
+                    raise
+
             return self.description
 
         @_service_description_required
@@ -394,6 +407,10 @@ class SSDPDevice:
                 :return: Response from the device's service after executing the specified action
                 :rtype: dict
             """
+
+            if self.description == exceptions.NotAvailableError:
+                raise exceptions.NotAvailableError('Can\'t execute actions because a description for this service is'
+                                                   ' not available.')
 
             try:
                 return self.actions[action_name]

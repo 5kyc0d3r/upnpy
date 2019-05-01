@@ -76,3 +76,15 @@ class NotRetrievedError(Exception):
     """
 
     pass
+
+
+class NotAvailableError(Exception):
+
+    """
+        **Custom exception for when a certain URL could not be retrieved**
+
+        Custom element not retrieved exception class.
+        Raised whenever a value needed to be accessed could not be retrieved from the URL.
+    """
+
+    pass
