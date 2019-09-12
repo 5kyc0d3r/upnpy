@@ -10,7 +10,6 @@ Quickstart
 ^^^^^^^^^^
 
 **Get the external IP address of an** `Internet Gateway Device`_ **:**
-----------------------------------------------------------------------
 
 ::
 
