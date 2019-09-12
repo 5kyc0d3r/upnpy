@@ -6,6 +6,11 @@
 
 Lightweight UPnP client library for Python.
 
+## Install
+```
+$ pip install upnpy
+```
+
 ## Examples
 
 #### Get the external IP address of an [Internet Gateway Device](https://en.wikipedia.org/wiki/Internet_Gateway_Device_Protocol):
