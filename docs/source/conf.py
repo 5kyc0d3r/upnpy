@@ -62,8 +62,8 @@ html_theme_options = {
     'github_banner': 'true',
     'github_button': 'true',
     'travis_button': 'true',
-    'font_size': '16px',
+    'font_size': '18px',
     'caption_font_size': '18px',
-    'code_font_size': '14px',
+    'code_font_size': '16px',
     'show_relbars': 'true'
 }
