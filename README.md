@@ -57,7 +57,6 @@ service.get_actions()
 service.GetExternalIPAddress()
 ```
 
-
 #### Add a new port mapping to an [Internet Gateway Device](https://en.wikipedia.org/wiki/Internet_Gateway_Device_Protocol):
 ```python
 import upnpy
