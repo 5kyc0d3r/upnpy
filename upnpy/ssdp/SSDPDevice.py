@@ -118,7 +118,7 @@ class SSDPDevice:
             self.description = device_description
             return device_description.decode()
 
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
+        except (urllib.error.HTTPError, urllib.error.URLError):
             self.description = exceptions.NotAvailableError
             return None
 
