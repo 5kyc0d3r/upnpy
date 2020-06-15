@@ -12,8 +12,9 @@ def parse_device_type(device_type):
         :return: Parsed device type
         :rtype: str
     """
-
-    return device_type.split(':')[3:][0]
+    if device_type:
+        return device_type.split(':')[3:][0]
+    return None
 
 
 def parse_service_id(service_id):
