@@ -144,7 +144,7 @@ class SSDPDevice:
         try:
             parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
             base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
-        except IndexError:
+        except (IndexError, AttributeError):
             parsed_url = urlparse(location_header_value)
             base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
 
