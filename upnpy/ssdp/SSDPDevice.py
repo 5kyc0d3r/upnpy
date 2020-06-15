@@ -18,6 +18,8 @@ def _device_description_required(func):
     def wrapper(device, *args, **kwargs):
         if device.description is None:
             raise exceptions.NotRetrievedError('No device description retrieved for this device.')
+        elif device.description == exceptions.NotAvailableError:
+            return
         return func(device, *args, **kwargs)
     return wrapper
 
@@ -111,9 +113,14 @@ class SSDPDevice:
         return self.friendly_name
 
     def _get_description_request(self, url):
-        device_description = utils.make_http_request(url).read()
-        self.description = device_description
-        return device_description.decode()
+        try:
+            device_description = utils.make_http_request(url).read()
+            self.description = device_description
+            return device_description.decode()
+
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
+            self.description = exceptions.NotAvailableError
+            return None
 
     @_device_description_required
     def _get_friendly_name_request(self):
