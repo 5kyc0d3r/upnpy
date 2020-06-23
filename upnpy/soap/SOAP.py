@@ -9,6 +9,8 @@ from upnpy import exceptions
 
 def _parse_response(response):
     response = response.read().decode()
+    response = response.replace("\r","")
+    response = response.replace("\n","")
     return_arguments = {}
 
     xml_root = minidom.parseString(response)
