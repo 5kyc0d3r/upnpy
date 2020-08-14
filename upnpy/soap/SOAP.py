@@ -7,9 +7,11 @@ import re
 import upnpy.utils as utils
 from upnpy import exceptions
 
+
 def _substitute_newlines_with_space(match):
-    s,e = match.span()
+    s, e = match.span()
     return match.string[s:e].replace('\n', ' ')
+
 
 def _parse_response(response, action_name):
     response = response.read().decode()
@@ -20,7 +22,8 @@ def _parse_response(response, action_name):
     return_arguments = {}
 
     xml_root = minidom.parseString(response)
-    xml_response_arguments = xml_root.getElementsByTagNameNS('*', 'Body')[0].getElementsByTagNameNS('*', action_name + 'Response')[0]
+    xml_response_arguments = xml_root.getElementsByTagNameNS('*', 'Body')[0] \
+        .getElementsByTagNameNS('*', action_name + 'Response')[0]
 
     for return_argument in xml_response_arguments.childNodes:
         if return_argument.firstChild is None:
