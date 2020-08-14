@@ -246,6 +246,15 @@ class SSDPDevice:
         """
 
         def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
+
+            if urlparse(scpd_url).scheme:
+                scpd_url = scpd_url
+            else:
+                if not scpd_url.startswith('/'):
+                    scpd_url = base_url + '/' + scpd_url
+                else:
+                    scpd_url = base_url + scpd_url
+
             self.service = service
             self.type_ = self._get_service_type(service)
             self.version = self._get_service_version(service)
@@ -290,7 +299,7 @@ class SSDPDevice:
             """
 
             try:
-                service_description = utils.make_http_request(self.base_url + self.scpd_url).read()
+                service_description = utils.make_http_request(self.scpd_url).read()
                 self.description = service_description.decode()
             except urllib.error.HTTPError as e:
                 if e.code == 404:
