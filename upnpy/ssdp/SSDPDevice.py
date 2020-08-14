@@ -139,10 +139,9 @@ class SSDPDevice:
     @_device_description_required
     def _get_base_url_request(self):
         location_header_value = utils.parse_http_header(self.response, 'Location')
+        header_url = urlparse(location_header_value)
         root = minidom.parseString(self.description)
-
         try:
-            header_url = urlparse(location_header_value)
             parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
 
             if parsed_url.port is not None:
