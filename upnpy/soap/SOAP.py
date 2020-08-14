@@ -2,17 +2,25 @@ import urllib.parse
 import urllib.error
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
+import re
 
 import upnpy.utils as utils
 from upnpy import exceptions
 
+def _substitute_newlines_with_space(match):
+    s,e = match.span()
+    return match.string[s:e].replace('\n', ' ')
 
-def _parse_response(response):
+def _parse_response(response, action_name):
     response = response.read().decode()
+
+    response = re.sub('(?<=>)[\\s\\t\\n]+(?=<)', '', response)
+    response = re.sub('<[^<>]+>', _substitute_newlines_with_space, response)
+
     return_arguments = {}
 
     xml_root = minidom.parseString(response)
-    xml_response_arguments = xml_root.getElementsByTagName('s:Body')[0].childNodes[0]
+    xml_response_arguments = xml_root.getElementsByTagNameNS('*', 'Body')[0].getElementsByTagNameNS('*', action_name + 'Response')[0]
 
     for return_argument in xml_response_arguments.childNodes:
         if return_argument.firstChild is None:
@@ -109,7 +117,8 @@ def send(service, action, **action_arguments):
 
     try:
         return _parse_response(
-            response=utils.make_http_request(full_control_url, data=soap_body, headers=headers)
+            utils.make_http_request(full_control_url, data=soap_body, headers=headers),
+            action.name
         )
     except urllib.error.HTTPError as e:
         if e.code == 500:

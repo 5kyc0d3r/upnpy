@@ -142,11 +142,15 @@ class SSDPDevice:
         root = minidom.parseString(self.description)
 
         try:
+            header_url = urlparse(location_header_value)
             parsed_url = urlparse(root.getElementsByTagName('URLBase')[0].firstChild.nodeValue)
-            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+
+            if parsed_url.port is not None:
+                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+            else:
+                base_url = f'{parsed_url.scheme}://{parsed_url.netloc}:{header_url.port}'
         except (IndexError, AttributeError):
-            parsed_url = urlparse(location_header_value)
-            base_url = f'{parsed_url.scheme}://{parsed_url.netloc}'
+            base_url = f'{header_url.scheme}://{header_url.netloc}'
 
         self.base_url = base_url
         return base_url
