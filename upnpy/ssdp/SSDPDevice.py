@@ -246,13 +246,31 @@ class SSDPDevice:
 
         def __init__(self, service, service_id, scpd_url, control_url, event_sub_url, base_url):
 
-            if urlparse(scpd_url).scheme:
-                scpd_url = scpd_url
-            else:
+            parsed_base_url = urlparse(base_url)
+            parsed_scpd_url = urlparse(scpd_url)
+
+            if parsed_base_url.scheme != 'http':
+                raise exceptions.SchemeError(
+                    'Scheme for base URL was something other than "http".', parsed_base_url.scheme)
+
+            if parsed_scpd_url.scheme == 'http':
+                if parsed_scpd_url.hostname != parsed_base_url.hostname:
+                    raise exceptions.HostnameError(
+                        'SCPD URL host does not match base URL host.',
+                        parsed_base_url.hostname,
+                        parsed_scpd_url.hostname
+                    )
+
+                # here scpd_url can stay as is: scpd_url = scpd_url
+
+            elif parsed_scpd_url.scheme == '':
                 if not scpd_url.startswith('/'):
                     scpd_url = base_url + '/' + scpd_url
                 else:
                     scpd_url = base_url + scpd_url
+            else:
+                raise exceptions.SchemeError(
+                    'Scheme for SCPD URL was something other than "http".', parsed_scpd_url.scheme)
 
             self.service = service
             self.type_ = self._get_service_type(service)

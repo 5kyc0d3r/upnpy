@@ -88,3 +88,30 @@ class NotAvailableError(Exception):
     """
 
     pass
+
+
+class HostnameError(Exception):
+
+    """
+        **Custom exception for when a device's SCPD host doesn't match the base URL's host**
+
+        Raised whenever the SCPD host doesn't match the base URL host.
+    """
+
+    def __init__(self, message, base_host, scpd_host):
+        self.message = message
+        self.base_host = base_host
+        self.scpd_host = scpd_host
+
+
+class SchemeError(Exception):
+
+    """
+        **Custom exception for when an invalid scheme has been found**
+
+        Raised whenever an invalid scheme was found.
+    """
+
+    def __init__(self, message, scheme):
+        self.message = message
+        self.scheme = scheme
