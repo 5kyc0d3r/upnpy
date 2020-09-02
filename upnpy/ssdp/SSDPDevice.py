@@ -114,13 +114,16 @@ class SSDPDevice:
 
     def _get_description_request(self, url):
         try:
-            device_description = utils.make_http_request(url).read()
-            self.description = device_description
-            return device_description.decode()
+            http_response = utils.make_http_request(url)
+            if http_response.getheader("Content-Type") == 'text/xml':
+                device_description = http_response.read()
+                self.description = device_description
+                return device_description.decode()
 
         except (urllib.error.HTTPError, urllib.error.URLError):
             self.description = exceptions.NotAvailableError
-            return None
+
+        return None
 
     @_device_description_required
     def _get_friendly_name_request(self):
