@@ -167,8 +167,8 @@ class SSDPDevice:
                 service_string = service.getElementsByTagName('serviceType')[0].firstChild.nodeValue
                 service_id = service.getElementsByTagName('serviceId')[0].firstChild.nodeValue
                 scpd_url = service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue
-                control_url = service.getElementsByTagName('controlURL')[0].firstChild.nodeValue
-                event_sub_url = service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
+                control_url = utils.safe_get_firstChild(service, 'controlURL')
+                event_sub_url = utils.safe_get_firstChild(service, 'eventSubURL')
 
                 parsed_service_id = utils.parse_service_id(service_id)
 
@@ -317,7 +317,10 @@ class SSDPDevice:
 
             try:
                 service_description = utils.make_http_request(self.scpd_url).read()
-                self.description = service_description.decode()
+                if not service_description:
+                    self.description = exceptions.NotAvailableError
+                else:
+                    self.description = service_description.decode()
             except urllib.error.HTTPError as e:
                 if e.code == 404:
                     self.description = exceptions.NotAvailableError
