@@ -79,3 +79,12 @@ def make_http_request(url, data=None, headers=None):
     # If data is provided the request method will automatically be set to POST by urllib
     request = urllib.request.Request(url, data=data, headers=headers)
     return urllib.request.urlopen(request)
+
+
+def safe_get_firstChild(doc, element_name):
+    node = doc.getElementsByTagName(element_name)[0].firstChild
+
+    try:
+        return node.nodeValue
+    except AttributeError:
+        pass
