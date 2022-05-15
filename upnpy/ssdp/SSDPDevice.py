@@ -162,13 +162,15 @@ class SSDPDevice:
             root = minidom.parseString(self.description)
 
             base_url = self.base_url
-
             for service in root.getElementsByTagName('service'):
                 service_string = service.getElementsByTagName('serviceType')[0].firstChild.nodeValue
                 service_id = service.getElementsByTagName('serviceId')[0].firstChild.nodeValue
                 scpd_url = service.getElementsByTagName('SCPDURL')[0].firstChild.nodeValue
-                control_url = service.getElementsByTagName('controlURL')[0].firstChild.nodeValue
-                event_sub_url = service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
+                control_url = None
+                event_sub_url = None
+                if service.getElementsByTagName('controlURL')[0].firstChild:
+                    control_url = service.getElementsByTagName('controlURL')[0].firstChild.nodeValue
+                    event_sub_url = service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
 
                 parsed_service_id = utils.parse_service_id(service_id)
 
