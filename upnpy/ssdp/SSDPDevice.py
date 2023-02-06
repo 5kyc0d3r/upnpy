@@ -170,6 +170,13 @@ class SSDPDevice:
                 control_url = service.getElementsByTagName('controlURL')[0].firstChild.nodeValue
                 event_sub_url = service.getElementsByTagName('eventSubURL')[0].firstChild.nodeValue
 
+                if scpd_url.startswith(base_url):
+                    scpd_url = scpd_url[len(base_url):]
+                if control_url.startswith(base_url):
+                    control_url = control_url[len(base_url):]
+                if event_sub_url.startswith(base_url):
+                    event_sub_url = event_sub_url[len(base_url):]
+
                 parsed_service_id = utils.parse_service_id(service_id)
 
                 if parsed_service_id not in device_services.keys():

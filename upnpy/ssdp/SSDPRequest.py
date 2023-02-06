@@ -95,10 +95,16 @@ class SSDPRequest(SSDPHeader):
 
                 # UDP packet data limit is 65507 imposed by IPv4
                 # https://en.wikipedia.org/wiki/User_Datagram_Protocol#Packet_structure
-
                 response, addr = self.socket.recvfrom(65507)
-                device = SSDPDevice(addr, response.decode())
-                devices.append(device)
+                try:
+                    # Some devices may reply with a malformed error response so
+                    # just ignore them; we don't want one bad device to prevent
+                    # us from creating others.
+                    device = SSDPDevice(addr, response.decode())
+                    devices.append(device)
+                except Exception:
+                    pass
+
         except socket.timeout:
             pass
 
